@@ -1,0 +1,19 @@
+# ShopEase robots rules
+User-agent: *
+Allow: /
+# Admin panel, account, cart and checkout pages are private
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /my-orders
+Disallow: /assistant
+Disallow: /profile
+Disallow: /change-password
+Disallow: /cart
+Disallow: /checkout
+Disallow: /payment
+Disallow: /order-success
+Disallow: /order-failure
+Disallow: /forgot-change-password
+
+# Replace with your real domain before going live
+Sitemap: https://www.your-domain.com/sitemap.xml

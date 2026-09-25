@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------
+   Admin theme gradient - used by the sidebar, table headers and the
+   active pagination button. Change these two lines to re-colour them all.
+------------------------------------------------------------------- */
+:root {
+  --cp-gradient: linear-gradient(135deg, #1d4ed8 0%, #0284c7 50%, #0891b2 100%);
+  --cp-gradient-shadow: 0 10px 30px -10px rgba(2, 132, 199, 0.55);
+}
+
+/* Background + glow. background-size comes after the shorthand so the slow
+   animate-gradient shift still works. */
+.cp-gradient {
+  background: var(--cp-gradient);
+  background-size: 200% 200%;
+  box-shadow: var(--cp-gradient-shadow);
+}
+/* Same colours without the glow (table header row) */
+.cp-gradient-bg {
+  background: var(--cp-gradient);
+  background-size: 200% 200%;
+}
+
+/* ------------------------------------------------------------------
+   Global button animation
+   Every solid primary / brand / red button gets a moving gradient,
+   a lift on hover, a light "shine" sweep and a press-in on click -
+   without touching each page's markup.
+------------------------------------------------------------------- */
+:is(button, a).bg-primary-600,
+:is(button, a).bg-brand-600,
+:is(button, a).bg-red-600 {
+  background-size: 200% 200%;
+  background-position: 0% 50%;
+  transition: background-position 0.5s ease, transform 0.15s ease, box-shadow 0.25s ease, opacity 0.2s ease;
+}
+:is(button, a).bg-primary-600 { background-image: linear-gradient(120deg, #6366f1 0%, #4338ca 45%, #7c3aed 100%); }
+:is(button, a).bg-brand-600 { background-image: linear-gradient(120deg, #fb923c 0%, #ea580c 45%, #e11d48 100%); }
+:is(button, a).bg-red-600 { background-image: linear-gradient(120deg, #f87171 0%, #dc2626 45%, #be123c 100%); }
+
+:is(button, a):is(.bg-primary-600, .bg-brand-600, .bg-red-600):not(:disabled):hover {
+  background-position: 100% 50%;
+  transform: translateY(-1px);
+}
+:is(button, a).bg-primary-600:not(:disabled):hover { box-shadow: 0 10px 22px -8px rgba(67, 56, 202, 0.6); }
+:is(button, a).bg-brand-600:not(:disabled):hover { box-shadow: 0 10px 22px -8px rgba(234, 88, 12, 0.6); }
+:is(button, a).bg-red-600:not(:disabled):hover { box-shadow: 0 10px 22px -8px rgba(220, 38, 38, 0.6); }
+
+/* Shine sweep - skipped on absolutely/fixed positioned buttons so their layout is untouched */
+:is(button, a):is(.bg-primary-600, .bg-brand-600, .bg-red-600):not(.absolute):not(.fixed):not(.sticky) {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+:is(button, a):is(.bg-primary-600, .bg-brand-600, .bg-red-600)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 0.6s ease;
+  pointer-events: none;
+}
+:is(button, a):is(.bg-primary-600, .bg-brand-600, .bg-red-600):not(:disabled):hover::after {
+  transform: translateX(120%);
+}
+
+/* Every button presses in slightly when clicked */
+button:not(:disabled):active,
+a[role='button']:active {
+  transform: scale(0.96);
+}
+
+/* Respect users who turn animations off */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
