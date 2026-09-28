@@ -3,4 +3,5 @@ uploads/*
 !uploads/.gitkeep
 *.log
 public/
+dist/
 logs/

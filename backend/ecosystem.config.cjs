@@ -7,7 +7,7 @@
 module.exports = {
   apps: [
     {
-      name: 'ecommerce',
+      name: 'ecommshop',
       script: 'src/server.js',
       cwd: __dirname,
       // Single process: Socket.IO rooms, the captcha store and rate limits live in memory per process
@@ -22,6 +22,14 @@ module.exports = {
       env: {
         NODE_ENV: 'development',
         PORT: 5002,
+        BASE_URL: '0.0.0.0',
+        DB_USER: 'root',
+        DB_PASSWORD: '',
+        DB_NAME: 'ecommerce_db_live',
+        CLIENT_ADMIN_URL: 'http://192.168.1.103:5174',
+        CLIENT_WEBSITE_URL: 'http://192.168.1.103:5174',
+
+        PYTHON_AI_SERVICE_URL: 'http://192.168.1.103:8002',
       },
       env_production: {
         NODE_ENV: 'production',

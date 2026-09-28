@@ -25,7 +25,7 @@ app.use(helmet({
   crossOriginResourcePolicy: false,
   // Razorpay Checkout opens popups (UPI apps / bank 3-D Secure pages)
   crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
-  // Rules for the built website/admin (frontend/dist) served below
+  // Rules for the built website/admin (backend/dist) served below
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
@@ -56,9 +56,9 @@ app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 app.get('/api/health', (req, res) => res.json({ success: true, message: 'API is running' }));
 app.use('/api', routes);
 
-// Built frontend (npm run build:frontend -> backend/public) - website + admin panel on this same port.
+// Built frontend (npm run build:frontend -> backend/dist) - website + admin panel on this same port.
 // Unknown /api and /uploads paths still get the JSON 404 below.
-const FRONTEND_DIST = path.join(__dirname, '..', 'public');
+const FRONTEND_DIST = path.join(__dirname, '..', 'dist');
 if (fs.existsSync(path.join(FRONTEND_DIST, 'index.html'))) {
   app.use(express.static(FRONTEND_DIST, {
     index: false,

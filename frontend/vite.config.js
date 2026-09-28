@@ -7,5 +7,9 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 5174,
   },
-  
+  // Build straight into the backend so it serves the website + admin on its own port
+  build: {
+    outDir: '../backend/dist',
+    emptyOutDir: true,
+  },
 });
