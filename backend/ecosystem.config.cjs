@@ -21,11 +21,11 @@ module.exports = {
       error_file: './logs/error.log',
       env: {
         NODE_ENV: 'development',
-        PORT: 5000,
+        PORT: 5002,
       },
       env_production: {
         NODE_ENV: 'production',
-        PORT: 5000,
+        PORT: 5002,
       },
     },
   ],
