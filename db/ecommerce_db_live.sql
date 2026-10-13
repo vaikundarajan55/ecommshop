@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 28, 2026 at 08:11 AM
+-- Generation Time: Oct 13, 2026 at 10:05 AM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.2.0
 
@@ -275,7 +275,9 @@ INSERT INTO `orders` (`id`, `order_no`, `user_id`, `total_amount`, `payment_meth
 (21, 'ORD-1790227480987', 3, '18.00', 'card', 'pending', NULL, 'pending', '{\"line1\":\"ddsfsdfsd\",\"city\":\"dsdfsd\",\"state\":\"sdfsdf\",\"pincode\":\"234567\",\"phone\":\"9976733564\"}', '2026-09-24 10:54:40', '2026-09-24 10:54:41'),
 (23, 'ORD-1790228182891', 3, '9.00', 'card', 'paid', 'pay_DEMO34ad02f263baa5', 'pending', '{\"line1\":\"dfsd\",\"city\":\"fsdf\",\"state\":\"sdfsd\",\"pincode\":\"455345\",\"phone\":\"9976733564\"}', '2026-09-24 11:06:22', '2026-09-24 11:06:23'),
 (24, 'ORD-1790228373407', 3, '9.00', 'card', 'paid', 'pay_DEMOb2edbe476f2f29', 'pending', '{\"line1\":\"vv\",\"city\":\"bvbv\",\"state\":\"vbv\",\"pincode\":\"345678\",\"phone\":\"9976733564\"}', '2026-09-24 11:09:33', '2026-09-24 11:09:33'),
-(25, 'ORD-1790575791014', 3, '140.00', 'card', 'paid', 'pay_DEMO9210c613c59651', 'pending', '{\"line1\":\"rwerw\",\"city\":\"werwe\",\"state\":\"rwer\",\"pincode\":\"234424\",\"phone\":\"9976733564\"}', '2026-09-28 11:39:51', '2026-09-28 11:39:51');
+(25, 'ORD-1790575791014', 3, '140.00', 'card', 'paid', 'pay_DEMO9210c613c59651', 'pending', '{\"line1\":\"rwerw\",\"city\":\"werwe\",\"state\":\"rwer\",\"pincode\":\"234424\",\"phone\":\"9976733564\"}', '2026-09-28 11:39:51', '2026-09-28 11:39:51'),
+(26, 'ORD-1790576508329', 3, '280.00', 'card', 'paid', 'pay_DEMOafd2bb5211f1ff', 'pending', '{\"line1\":\"dfsdf\",\"city\":\"sdfsd\",\"state\":\"fsdfsdf\",\"pincode\":\"345678\",\"phone\":\"9976733564\"}', '2026-09-28 11:51:48', '2026-09-28 11:51:48'),
+(27, 'ORD-1790578992461', 3, '20.00', 'card', 'paid', 'pay_DEMO555eb621374b2d', 'pending', '{\"line1\":\"rtert\",\"city\":\"ertert\",\"state\":\"erter\",\"pincode\":\"345678\",\"phone\":\"9976733564\"}', '2026-09-28 12:33:12', '2026-09-28 12:33:12');
 
 -- --------------------------------------------------------
 
@@ -306,7 +308,9 @@ INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `product_name`, `pric
 (9, 21, 4, 'asAS', '9.00', 2, '18.00'),
 (11, 23, 4, 'asAS', '9.00', 1, '9.00'),
 (12, 24, 4, 'asAS', '9.00', 1, '9.00'),
-(13, 25, 8, 'Veg', '140.00', 1, '140.00');
+(13, 25, 8, 'Veg', '140.00', 1, '140.00'),
+(14, 26, 8, 'Veg', '140.00', 2, '280.00'),
+(15, 27, 1, 'Test LIve', '20.00', 1, '20.00');
 
 -- --------------------------------------------------------
 
@@ -342,7 +346,9 @@ INSERT INTO `order_tracking` (`id`, `order_id`, `status`, `note`, `predicted_del
 (16, 23, 'pending', 'AI predicted delivery window generated', '2026-09-28 05:36:23', '2026-09-24 11:06:23'),
 (17, 24, 'pending', 'Order placed - payment received (pay_DEMOb2edbe476f2f29)', NULL, '2026-09-24 11:09:33'),
 (18, 24, 'pending', 'AI predicted delivery window generated', '2026-09-28 05:39:33', '2026-09-24 11:09:33'),
-(19, 25, 'pending', 'Order placed - payment received (pay_DEMO9210c613c59651)', NULL, '2026-09-28 11:39:51');
+(19, 25, 'pending', 'Order placed - payment received (pay_DEMO9210c613c59651)', NULL, '2026-09-28 11:39:51'),
+(20, 26, 'pending', 'Order placed - payment received (pay_DEMOafd2bb5211f1ff)', NULL, '2026-09-28 11:51:48'),
+(21, 27, 'pending', 'Order placed - payment received (pay_DEMO555eb621374b2d)', NULL, '2026-09-28 12:33:12');
 
 -- --------------------------------------------------------
 
@@ -401,10 +407,10 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `category_id`, `subcategory_id`, `name`, `slug`, `sku`, `description`, `price`, `discount_price`, `stock`, `status`, `highlight`, `created_at`, `updated_at`) VALUES
-(1, 5, 8, 'Test LIve', 'test-live-11399', '100', 'dasdasd', '250.00', '20.00', 8, 'active', 'featured', '2026-09-23 11:02:10', '2026-09-28 11:36:51'),
+(1, 5, 8, 'Test LIve', 'test-live-11399', '100', 'dasdasd', '250.00', '20.00', 7, 'active', 'featured', '2026-09-23 11:02:10', '2026-09-28 12:33:12'),
 (4, 7, 6, 'Live Test', 'live-test-75648', 'A34234', 'DFSDF', '29.00', '9.00', 10, 'active', 'current', '2026-09-23 11:14:33', '2026-09-28 11:36:15'),
 (5, 11, 5, 'Vegetable', 'vegetable-40414', 'sdfsd', 'sdfsdf', '232.00', '230.00', 231, 'active', 'none', '2026-09-23 11:23:53', '2026-09-28 11:35:40'),
-(8, 1, 9, 'Veg', 'veg-78351', '23123123', 'dfsdf', '200.00', '140.00', 19, 'active', 'current', '2026-09-28 11:37:58', '2026-09-28 11:39:51');
+(8, 1, 9, 'Veg', 'veg-78351', '23123123', 'dfsdf', '200.00', '140.00', 17, 'active', 'current', '2026-09-28 11:37:58', '2026-09-28 11:51:48');
 
 -- --------------------------------------------------------
 
@@ -467,7 +473,9 @@ CREATE TABLE `razorpay_payments` (
 INSERT INTO `razorpay_payments` (`id`, `user_id`, `razorpay_order_id`, `razorpay_payment_id`, `amount`, `payment_method`, `items`, `status`, `order_id`, `error`, `created_at`, `updated_at`) VALUES
 (3, 3, 'order_DEMOb5f152fa6f1787', 'pay_DEMO34ad02f263baa5', '9.00', 'card', '[{\"productId\":4,\"name\":\"asAS\",\"price\":9,\"quantity\":1}]', 'paid', 23, NULL, '2026-09-24 11:06:15', '2026-09-24 11:06:22'),
 (4, 3, 'order_DEMOcfeadb4c6317e8', 'pay_DEMOb2edbe476f2f29', '9.00', 'card', '[{\"productId\":4,\"name\":\"asAS\",\"price\":9,\"quantity\":1}]', 'paid', 24, NULL, '2026-09-24 11:09:24', '2026-09-24 11:09:33'),
-(5, 3, 'order_DEMOe490a37b2681b3', 'pay_DEMO9210c613c59651', '140.00', 'card', '[{\"productId\":8,\"name\":\"Veg\",\"price\":140,\"quantity\":1}]', 'paid', 25, NULL, '2026-09-28 11:39:45', '2026-09-28 11:39:51');
+(5, 3, 'order_DEMOe490a37b2681b3', 'pay_DEMO9210c613c59651', '140.00', 'card', '[{\"productId\":8,\"name\":\"Veg\",\"price\":140,\"quantity\":1}]', 'paid', 25, NULL, '2026-09-28 11:39:45', '2026-09-28 11:39:51'),
+(6, 3, 'order_DEMOd21ebc7a858543', 'pay_DEMOafd2bb5211f1ff', '280.00', 'card', '[{\"productId\":8,\"name\":\"Veg\",\"price\":140,\"quantity\":2}]', 'paid', 26, NULL, '2026-09-28 11:51:44', '2026-09-28 11:51:48'),
+(7, 3, 'order_DEMOc00a7b2c3dc399', 'pay_DEMO555eb621374b2d', '20.00', 'card', '[{\"productId\":1,\"name\":\"Test LIve\",\"price\":20,\"quantity\":1}]', 'paid', 27, NULL, '2026-09-28 12:33:07', '2026-09-28 12:33:12');
 
 -- --------------------------------------------------------
 
@@ -621,7 +629,32 @@ INSERT INTO `site_visits` (`id`, `ip_address`, `path`, `page_name`, `user_agent`
 (98, '192.168.1.103', '/payment', 'Payment', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 11:39:39'),
 (99, '192.168.1.103', '/checkout', 'Checkout', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 11:39:53'),
 (100, '192.168.1.103', '/cart', 'Cart', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 11:39:53'),
-(101, '192.168.1.103', '/products', 'Products', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 11:39:57');
+(101, '192.168.1.103', '/products', 'Products', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 11:39:57'),
+(102, '192.168.1.103', '/products', 'Products', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', 'http://192.168.1.103:5174/products', 3, '2026-09-28 11:49:52'),
+(103, '192.168.1.103', '/products', 'Products', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, NULL, '2026-09-28 11:49:55'),
+(104, '192.168.1.103', '/', 'Home', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, NULL, '2026-09-28 11:50:47'),
+(105, '192.168.1.103', '/products', 'Products', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, NULL, '2026-09-28 11:50:54'),
+(106, '192.168.1.103', '/products/8', 'Product: Veg', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, NULL, '2026-09-28 11:50:56'),
+(107, '192.168.1.103', '/cart', 'Cart', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, NULL, '2026-09-28 11:51:02'),
+(108, '192.168.1.103', '/checkout', 'Checkout', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, NULL, '2026-09-28 11:51:04'),
+(109, '192.168.1.103', '/login', 'Login', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, NULL, '2026-09-28 11:51:04'),
+(110, '192.168.1.103', '/checkout', 'Checkout', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 11:51:32'),
+(111, '192.168.1.103', '/payment', 'Payment', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 11:51:39'),
+(112, '192.168.1.103', '/cart', 'Cart', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 11:51:50'),
+(113, '192.168.1.103', '/checkout', 'Checkout', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 11:51:50'),
+(114, '192.168.1.103', '/products', 'Products', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 11:51:54'),
+(115, '192.168.1.103', '/products', 'Products', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 12:31:36'),
+(116, '192.168.1.103', '/products', 'Products', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 12:31:37'),
+(117, '192.168.1.103', '/products', 'Products', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 12:32:34'),
+(118, '192.168.1.103', '/', 'Home', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 12:32:47'),
+(119, '192.168.1.103', '/products?categoryId=5', 'Products: Food', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 12:32:49'),
+(120, '192.168.1.103', '/products/1', 'Product: Test LIve', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 12:32:51'),
+(121, '192.168.1.103', '/cart', 'Cart', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 12:32:55'),
+(122, '192.168.1.103', '/checkout', 'Checkout', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 12:32:57'),
+(123, '192.168.1.103', '/payment', 'Payment', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 12:33:03'),
+(124, '192.168.1.103', '/checkout', 'Checkout', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 12:33:14'),
+(125, '192.168.1.103', '/cart', 'Cart', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 12:33:14'),
+(126, '192.168.1.103', '/products', 'Products', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', NULL, 3, '2026-09-28 12:33:18');
 
 -- --------------------------------------------------------
 
@@ -898,19 +931,19 @@ ALTER TABLE `contact_messages`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `order_tracking`
 --
 ALTER TABLE `order_tracking`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `payment_methods`
@@ -934,13 +967,13 @@ ALTER TABLE `product_images`
 -- AUTO_INCREMENT for table `razorpay_payments`
 --
 ALTER TABLE `razorpay_payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `site_visits`
 --
 ALTER TABLE `site_visits`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=127;
 
 --
 -- AUTO_INCREMENT for table `subcategories`
