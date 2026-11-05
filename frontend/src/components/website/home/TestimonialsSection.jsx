@@ -28,7 +28,7 @@ export default function TestimonialsSection({ items }) {
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {items.slice(0, 6).map((t, i) => (
             <figure
-              key={t.id}
+              key={t.testimonial_id}
               className={`group relative flex flex-col rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100 transition-all duration-700 hover:-translate-y-2 hover:shadow-xl hover:shadow-rose-500/10 ${
                 visible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
               }`}

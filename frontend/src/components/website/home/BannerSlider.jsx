@@ -50,7 +50,7 @@ export default function BannerSlider({ banners }) {
         const active = i === index;
         return (
           <div
-            key={b.id}
+            key={b.banner_id}
             className={`absolute inset-0 transition-opacity duration-1000 ${active ? 'z-10 opacity-100' : 'z-0 opacity-0'}`}
             aria-hidden={!active} role="group" aria-roledescription="slide" aria-label={`${i + 1} of ${count}`}
           >
@@ -88,7 +88,7 @@ export default function BannerSlider({ banners }) {
           </button>
           <div className="absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 gap-2">
             {banners.map((b, i) => (
-              <button key={b.id} onClick={() => go(i)} aria-label={`Go to slide ${i + 1}`} aria-current={i === index}
+              <button key={b.banner_id} onClick={() => go(i)} aria-label={`Go to slide ${i + 1}`} aria-current={i === index}
                 className={`h-2.5 overflow-hidden rounded-full bg-white/40 transition-all duration-500 ${i === index ? 'w-10' : 'w-2.5 hover:bg-white/70'}`}>
                 {/* progress fill for the current slide */}
                 {i === index && (

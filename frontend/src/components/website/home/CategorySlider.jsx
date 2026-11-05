@@ -6,7 +6,7 @@ import Carousel from './Carousel';
 function CategoryCard({ category: c, index }) {
   return (
     <Link
-      to={`/products?categoryId=${c.id}`}
+      to={`/products?categoryId=${c.category_id}`}
       className="group relative block aspect-[4/3] animate-scaleIn overflow-hidden rounded-xl bg-gradient-to-br from-brand-100 to-rose-100 shadow-sm transition-shadow duration-300 hover:shadow-xl"
       style={{ animationDelay: `${index * 80}ms` }}
     >
@@ -31,7 +31,7 @@ export default function CategorySlider({ categories }) {
   return (
     <Carousel
       items={categories}
-      getKey={(c) => c.id}
+      getKey={(c) => c.category_id}
       label="categories"
       dotLabel={(c) => c.name}
       renderItem={(c, i) => <CategoryCard category={c} index={i} />}

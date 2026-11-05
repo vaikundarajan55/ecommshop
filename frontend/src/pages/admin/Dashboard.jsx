@@ -270,6 +270,7 @@ export default function Dashboard() {
           </button>
         </div>
         <DataTable
+          rowKey="order_id"
           columns={[
             { key: 'order_no', label: 'Order No', render: (r) => <span className="font-medium text-gray-800">{r.order_no}</span> },
             {

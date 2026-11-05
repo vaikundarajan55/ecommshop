@@ -12,7 +12,7 @@ import StatusBadge from '../../components/admin/common/StatusBadge';
 import ActionButton, { ActionGroup } from '../../components/admin/common/ActionButton';
 import Stars from '../../components/common/Stars';
 
-const emptyForm = { id: null, name: '', designation: '', message: '', rating: 5, sort_order: 0, status: 'active', image: null, existingImage: null };
+const emptyForm = { testimonial_id: null, name: '', designation: '', message: '', rating: 5, sort_order: 0, status: 'active', image: null, existingImage: null };
 const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm';
 
 function Avatar({ name, image, size = 'h-10 w-10' }) {
@@ -40,7 +40,7 @@ export default function Testimonials() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (form.id) {
+      if (form.testimonial_id) {
         await dispatch(updateTestimonial(form)).unwrap();
         notify.updated('Testimonial updated successfully');
       } else {
@@ -48,8 +48,8 @@ export default function Testimonials() {
         notify.created('Testimonial added successfully');
       }
       setModalOpen(false);
-    } catch (message) {
-      notify.error(message);
+    } catch (err) {
+      notify.error(err.message);
     }
   };
 
@@ -57,7 +57,7 @@ export default function Testimonials() {
     const ok = await confirmDialog({
       title: 'Delete testimonial?',
       message: `The testimonial from "${row.name}" will be permanently deleted.`,
-      onConfirm: () => dispatch(deleteTestimonial(row.id)).unwrap(),
+      onConfirm: () => dispatch(deleteTestimonial(row.testimonial_id)).unwrap(),
     });
     if (!ok) return;
     notify.deleted('Testimonial deleted successfully');
@@ -74,6 +74,7 @@ export default function Testimonials() {
       </div>
 
       <DataTable
+        rowKey="testimonial_id"
         columns={[
           {
             key: 'name', label: 'Customer',
@@ -99,7 +100,7 @@ export default function Testimonials() {
         )}
       />
 
-      <Modal open={modalOpen} size="max-w-2xl" title={form.id ? 'Edit Testimonial' : 'Add Testimonial'} onClose={() => setModalOpen(false)}>
+      <Modal open={modalOpen} size="max-w-2xl" title={form.testimonial_id ? 'Edit Testimonial' : 'Add Testimonial'} onClose={() => setModalOpen(false)}>
         <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-[180px_1fr]">
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-600">Photo</label>

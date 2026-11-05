@@ -37,7 +37,7 @@ function HighlightBadge({ value }) {
 }
 
 const emptyForm = {
-  id: null, category_id: '', subcategory_id: '', name: '', sku: '',
+  product_id: null, category_id: '', subcategory_id: '', name: '', sku: '',
   description: '', price: '', discount_price: '', stock: '', status: 'active', highlight: 'none',
   images: [], existingImages: [],
 };
@@ -103,10 +103,10 @@ export default function Product() {
   const openCreate = () => { setForm(emptyForm); setErrors({}); setModalOpen(true); };
 
   const openEdit = async (row) => {
-    const product = await fetchProduct(row.id, 'edit');
+    const product = await fetchProduct(row.product_id, 'edit');
     if (!product) return;
     const values = Object.fromEntries(FIELDS.map((k) => [k, product[k] ?? '']));
-    setForm({ ...emptyForm, ...values, id: product.id, existingImages: product.images || [] });
+    setForm({ ...emptyForm, ...values, product_id: product.product_id, existingImages: product.images || [] });
     setErrors({});
     setModalOpen(true);
   };
@@ -119,7 +119,7 @@ export default function Product() {
   const cls = (key) => (errors[key] ? errorCls : inputCls);
 
   const openView = async (row) => {
-    const product = await fetchProduct(row.id, 'view');
+    const product = await fetchProduct(row.product_id, 'view');
     if (!product) return;
     const images = [...(product.images || [])].sort((a, b) => b.is_primary - a.is_primary);
     setViewData({ ...product, images });
@@ -130,7 +130,7 @@ export default function Product() {
   // The thunks reload the list (its thumbnail follows the primary image); this refreshes the open form
   const refreshImages = async () => {
     try {
-      const product = await dispatch(fetchProductById(form.id)).unwrap();
+      const product = await dispatch(fetchProductById(form.product_id)).unwrap();
       setForm((f) => ({ ...f, existingImages: product.images || [] }));
     } catch (message) {
       notify.error(message);
@@ -143,7 +143,7 @@ export default function Product() {
       message: 'The image will be deleted from the product right away.',
       confirmText: 'Yes, remove',
       doneText: 'Removed!',
-      onConfirm: () => dispatch(deleteProductImage({ productId: form.id, imageId: img.id })).unwrap(),
+      onConfirm: () => dispatch(deleteProductImage({ productId: form.product_id, imageId: img.product_image_id })).unwrap(),
     });
     if (!ok) return;
     notify.deleted('Product image removed');
@@ -152,7 +152,7 @@ export default function Product() {
 
   const setPrimaryImage = async (img) => {
     try {
-      await dispatch(setPrimaryProductImage({ productId: form.id, imageId: img.id })).unwrap();
+      await dispatch(setPrimaryProductImage({ productId: form.product_id, imageId: img.product_image_id })).unwrap();
       notify.updated('Main image updated');
       refreshImages();
     } catch (message) {
@@ -162,13 +162,13 @@ export default function Product() {
 
   const changeCategory = (categoryId) => {
     // Clear the subcategory if it doesn't belong to the newly chosen category
-    const keepSub = subcategories.some((s) => String(s.id) === String(form.subcategory_id) && String(s.category_id) === String(categoryId));
+    const keepSub = subcategories.some((s) => String(s.subcategory_id) === String(form.subcategory_id) && String(s.category_id) === String(categoryId));
     setForm({ ...form, category_id: categoryId, subcategory_id: keepSub ? form.subcategory_id : '' });
     setErrors(({ category_id: _c, subcategory_id: _s, ...rest }) => rest);
   };
 
   // Loaded products (the server checks all of them) already using this name
-  const duplicate = findDuplicate(rows, form.name, form.id);
+  const duplicate = findDuplicate(rows, form.name, form.product_id, 'product_id');
   const nameError = errors.name || (duplicate ? `A product named "${duplicate.name}" already exists` : '');
 
   const handleSubmit = async (e) => {
@@ -180,7 +180,7 @@ export default function Product() {
       return notify.error(Object.values(found)[0]);
     }
     try {
-      if (form.id) {
+      if (form.product_id) {
         await dispatch(updateProduct(form)).unwrap();
         notify.updated('Product updated successfully');
       } else {
@@ -198,7 +198,7 @@ export default function Product() {
     const ok = await confirmDialog({
       title: 'Delete product?',
       message: `"${row.name}" and all its images will be permanently deleted. This cannot be undone.`,
-      onConfirm: () => dispatch(deleteProduct(row.id)).unwrap(),
+      onConfirm: () => dispatch(deleteProduct(row.product_id)).unwrap(),
     });
     if (!ok) return;
     notify.deleted(`Product "${row.name}" deleted successfully`);
@@ -218,8 +218,9 @@ export default function Product() {
       </div>
 
       <DataTable
+        rowKey="product_id"
         columns={[
-          { key: 'id', label: 'ID' },
+          { key: 'product_id', label: 'ID' },
           { key: 'image', label: 'Image', render: (row) => <Thumb src={row.primary_image} alt={row.name} /> },
           { key: 'name', label: 'Name' },
           { key: 'category_name', label: 'Category' },
@@ -231,28 +232,28 @@ export default function Product() {
         rows={rows}
         renderActions={(row) => (
           <ActionGroup>
-            <ActionButton type="view" onClick={() => openView(row)} disabled={!!loadingId} loading={loadingId === row.id && loadingAction === 'view'} />
-            <ActionButton type="edit" onClick={() => openEdit(row)} disabled={!!loadingId} loading={loadingId === row.id && loadingAction === 'edit'} />
+            <ActionButton type="view" onClick={() => openView(row)} disabled={!!loadingId} loading={loadingId === row.product_id && loadingAction === 'view'} />
+            <ActionButton type="edit" onClick={() => openEdit(row)} disabled={!!loadingId} loading={loadingId === row.product_id && loadingAction === 'edit'} />
             <ActionButton type="delete" onClick={() => handleDelete(row)} />
           </ActionGroup>
         )}
       />
 
       {/* ---------- Add / Edit ---------- */}
-      <Modal open={modalOpen} size="max-w-3xl" title={form.id ? 'Edit Product' : 'Add Product'} onClose={() => setModalOpen(false)}>
+      <Modal open={modalOpen} size="max-w-3xl" title={form.product_id ? 'Edit Product' : 'Add Product'} onClose={() => setModalOpen(false)}>
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           <Section title="Category" delay={0}>
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="Category" error={errors.category_id}>
                 <select required value={form.category_id} onChange={(e) => changeCategory(e.target.value)} className={cls('category_id')}>
                   <option value="">Select category</option>
-                  {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  {categories.map((c) => <option key={c.category_id} value={c.category_id}>{c.name}</option>)}
                 </select>
               </Field>
               <Field label="Subcategory" error={errors.subcategory_id}>
                 <select value={form.subcategory_id} onChange={(e) => set('subcategory_id', e.target.value)} className={cls('subcategory_id')}>
                   <option value="">{form.category_id && !filteredSubcategories.length ? 'No subcategories' : 'Select subcategory'}</option>
-                  {filteredSubcategories.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  {filteredSubcategories.map((s) => <option key={s.subcategory_id} value={s.subcategory_id}>{s.name}</option>)}
                 </select>
               </Field>
             </div>
@@ -357,7 +358,7 @@ export default function Product() {
                     <div className="mt-3 grid grid-cols-5 gap-2">
                       {viewData.images.map((img, idx) => (
                         <button
-                          key={img.id} type="button" onClick={() => setActiveImage(idx)}
+                          key={img.product_image_id} type="button" onClick={() => setActiveImage(idx)}
                           className={`aspect-square animate-scaleIn overflow-hidden rounded-md border-2 transition-all duration-200 ${
                             idx === activeImage ? 'border-primary-500 ring-2 ring-primary-500/20' : 'border-transparent opacity-70 hover:opacity-100'
                           }`}

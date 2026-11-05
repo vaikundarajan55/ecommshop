@@ -21,7 +21,7 @@ export default function ProductCard({ product, index = 0 }) {
   return (
     <>
       <Link
-        to={`/products/${product.id}`}
+        to={`/products/${product.product_id}`}
         className="group relative block animate-fadeInUp overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-brand-100 hover:shadow-xl hover:shadow-brand-500/10"
         style={{ animationDelay: `${index * 70}ms` }}
       >
@@ -75,7 +75,7 @@ export default function ProductCard({ product, index = 0 }) {
         </div>
       </Link>
 
-      <QuickViewModal productId={product.id} open={quickOpen} onClose={() => setQuickOpen(false)} />
+      <QuickViewModal productId={product.product_id} open={quickOpen} onClose={() => setQuickOpen(false)} />
     </>
   );
 }

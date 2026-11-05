@@ -78,7 +78,7 @@ export default function MyOrders() {
       ) : (
         // key={tab} replays the entrance animation when switching tabs
         <div key={tab} className="grid gap-4 sm:grid-cols-2">
-          {shown.map((o, i) => <OrderCard key={o.id} order={o} index={i} onClick={() => setOpenId(o.id)} selected={openId === o.id} />)}
+          {shown.map((o, i) => <OrderCard key={o.order_id} order={o} index={i} onClick={() => setOpenId(o.order_id)} selected={openId === o.order_id} />)}
         </div>
       )}
 

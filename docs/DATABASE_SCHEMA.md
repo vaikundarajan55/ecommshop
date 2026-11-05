@@ -1,7 +1,8 @@
 # Database Schema Overview
 
-MySQL 8+. See `backend/database/schema.sql` for full DDL and
-`backend/database/procedures.sql` for stored procedures.
+MySQL 8+. Everything is in one file, `backend/database/schema.sql`: tables, indexes, foreign keys and data
+(no stored procedures; listing/report queries are plain SQL in the models). Every primary key is named after its table (`users.user_id`, `products.product_id`,
+`orders.order_id`, ...; `razorpay_payments.payment_id`).
 
 ## Tables
 - **users** — shared table for admin/staff/customers (`role` enum), password reset tokens
@@ -15,13 +16,6 @@ MySQL 8+. See `backend/database/schema.sql` for full DDL and
 - **order_tracking** — one row per status change; stores AI `predicted_delivery` per update; this is the
   source of truth for both the admin tracking modal and the customer-facing live tracker
 
-## Stored Procedures (backend/database/procedures.sql)
-- `sp_get_user_list(role, status, search, limit, offset)`
-- `sp_get_product_list(category_id, subcategory_id, search, status, min_price, max_price, limit, offset)`
-- `sp_get_order_list(status, user_id, date_from, date_to, search, limit, offset)`
-- `sp_get_order_report(date_from, date_to, status, group_by)` — group_by: day | status | payment_method
-- `sp_place_order_item(order_id, product_id, product_name, price, quantity)` — optional per-item insert path
-
 ## Order status flow
 `pending → confirmed → processing → packed → shipped → out_for_delivery → delivered`
-(with `cancelled` / `returned` as terminal side-states), enforced in `backend/src/models/orderModel.js`.
+(with `cancelled` / `returned` as terminal side-states), enforced in `backend/src/models/admin/orderModel.js`.

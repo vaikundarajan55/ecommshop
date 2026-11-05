@@ -1,6 +1,6 @@
-// src/controllers/dashboardController.js
+// src/controllers/admin/dashboardController.js
 // Admin dashboard: entity counts, today's orders, last-7-days and last-12-months order stats - one request
-const { pool } = require('../config/db');
+const { pool } = require('../../config/db');
 
 // Revenue ignores orders that never turned into money
 const REVENUE_SQL = "SUM(CASE WHEN status IN ('cancelled','returned') THEN 0 ELSE total_amount END)";
@@ -32,13 +32,13 @@ exports.summary = async (req, res, next) => {
     `);
 
     const [todayOrders] = await pool.query(
-      `SELECT o.id, o.order_no, o.total_amount, o.payment_method, o.payment_status, o.status, o.created_at,
+      `SELECT o.order_id, o.order_no, o.total_amount, o.payment_method, o.payment_status, o.status, o.created_at,
               u.name AS customer_name, u.email AS customer_email,
-              (SELECT COALESCE(SUM(oi.quantity), 0) FROM order_items oi WHERE oi.order_id = o.id) AS item_count
+              (SELECT COALESCE(SUM(oi.quantity), 0) FROM order_items oi WHERE oi.order_id = o.order_id) AS item_count
        FROM orders o
-       JOIN users u ON u.id = o.user_id
+       JOIN users u ON u.user_id = o.user_id
        WHERE DATE(o.created_at) = ?
-       ORDER BY o.created_at DESC`,
+       ORDER BY o.order_id ASC`,
       [today]
     );
 

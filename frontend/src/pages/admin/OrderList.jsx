@@ -36,7 +36,7 @@ export default function OrderList() {
 
   const openTracking = async (order) => {
     try {
-      const full = await dispatch(fetchOrderById(order.id)).unwrap();
+      const full = await dispatch(fetchOrderById(order.order_id)).unwrap();
       setTrackModal({ open: true, order: full, tracking: full.tracking });
       setStatusForm({ status: order.status, note: '' });
     } catch (message) {
@@ -47,7 +47,7 @@ export default function OrderList() {
   const submitStatusUpdate = async (e) => {
     e.preventDefault();
     try {
-      await dispatch(updateOrderStatus({ id: trackModal.order.id, ...statusForm })).unwrap();
+      await dispatch(updateOrderStatus({ id: trackModal.order.order_id, ...statusForm })).unwrap();
       notify.updated('Order status updated — customer notified in real time');
       setTrackModal({ open: false, order: null, tracking: [] });
     } catch (message) {
@@ -80,6 +80,7 @@ export default function OrderList() {
       </form>
 
       <DataTable
+        rowKey="order_id"
         columns={[
           { key: 'order_no', label: 'Order #' },
           { key: 'customer_name', label: 'Customer' },
@@ -100,7 +101,7 @@ export default function OrderList() {
       <Modal open={trackModal.open} title={`Order ${trackModal.order?.order_no || ''} - Tracking`} onClose={() => setTrackModal({ open: false, order: null, tracking: [] })}>
         <div className="mb-4 max-h-48 space-y-2 overflow-y-auto border-b pb-4">
           {trackModal.tracking.map((t) => (
-            <div key={t.id} className="text-sm">
+            <div key={t.order_tracking_id} className="text-sm">
               <span className="font-semibold capitalize">{t.status.replace('_', ' ')}</span>
               {t.note && <span className="text-gray-500"> — {t.note}</span>}
               <span className="block text-xs text-gray-400">{new Date(t.created_at).toLocaleString()}</span>

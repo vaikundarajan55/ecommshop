@@ -8,7 +8,7 @@ import DataTable from '../../components/admin/common/DataTable';
 import Modal from '../../components/admin/common/Modal';
 import ActionButton, { ActionGroup } from '../../components/admin/common/ActionButton';
 
-const emptyForm = { id: null, code: '', name: '', description: '', sort_order: 0, is_active: true };
+const emptyForm = { payment_method_id: null, code: '', name: '', description: '', sort_order: 0, is_active: true };
 
 // On/off switch
 function Toggle({ checked, onChange, disabled, label }) {
@@ -35,7 +35,7 @@ export default function PaymentMethods() {
   const toggleActive = async (row) => {
     try {
       await dispatch(updatePaymentMethod({
-        id: row.id, name: row.name, description: row.description, sort_order: row.sort_order, is_active: !row.is_active,
+        payment_method_id: row.payment_method_id, name: row.name, description: row.description, sort_order: row.sort_order, is_active: !row.is_active,
       })).unwrap();
       notify.updated(`${row.name} ${row.is_active ? 'turned off' : 'turned on'}`);
     } catch (message) {
@@ -45,7 +45,7 @@ export default function PaymentMethods() {
 
   const makeDefault = async (row) => {
     try {
-      const message = await dispatch(setDefaultPaymentMethod(row.id)).unwrap();
+      const message = await dispatch(setDefaultPaymentMethod(row.payment_method_id)).unwrap();
       notify.updated(message);
     } catch (message) {
       notify.error(message);
@@ -53,7 +53,7 @@ export default function PaymentMethods() {
   };
 
   const openEdit = (row) => {
-    setForm({ id: row.id, code: row.code, name: row.name, description: row.description || '', sort_order: row.sort_order, is_active: !!row.is_active, is_default: !!row.is_default });
+    setForm({ payment_method_id: row.payment_method_id, code: row.code, name: row.name, description: row.description || '', sort_order: row.sort_order, is_active: !!row.is_active, is_default: !!row.is_default });
     setModalOpen(true);
   };
 
@@ -83,6 +83,7 @@ export default function PaymentMethods() {
       </div>
 
       <DataTable
+        rowKey="payment_method_id"
         columns={[
           {
             key: 'name', label: 'Method',
@@ -108,10 +109,10 @@ export default function PaymentMethods() {
             render: (r) => (
               <div className="flex items-center gap-2">
                 <Toggle
-                  checked={!!r.is_active} onChange={() => toggleActive(r)} disabled={busyId === r.id}
+                  checked={!!r.is_active} onChange={() => toggleActive(r)} disabled={busyId === r.payment_method_id}
                   label={`${r.is_active ? 'Turn off' : 'Turn on'} ${r.name}`}
                 />
-                {busyId === r.id && <Loader2 size={14} className="animate-spin text-gray-400" />}
+                {busyId === r.payment_method_id && <Loader2 size={14} className="animate-spin text-gray-400" />}
               </div>
             ),
           },
@@ -123,7 +124,7 @@ export default function PaymentMethods() {
               </span>
             ) : (
               <button
-                onClick={() => makeDefault(r)} disabled={!r.is_active || busyId === r.id}
+                onClick={() => makeDefault(r)} disabled={!r.is_active || busyId === r.payment_method_id}
                 title={r.is_active ? 'Make default' : 'Turn on first'}
                 className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium text-gray-500 ring-1 ring-gray-200 transition-all hover:bg-amber-50 hover:text-amber-600 hover:ring-amber-300 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
               >

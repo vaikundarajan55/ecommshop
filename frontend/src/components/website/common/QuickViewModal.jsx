@@ -36,7 +36,7 @@ export default function QuickViewModal({ productId, open, onClose }) {
 
   const handleAdd = () => {
     dispatch(addToCart({
-      productId: product.id, name: product.name, price,
+      productId: product.product_id, name: product.name, price,
       image: product.images[0]?.image || null, quantity: qty,
     }));
     notify.created(`${qty} × ${product.name} added to cart`);
@@ -78,7 +78,7 @@ export default function QuickViewModal({ productId, open, onClose }) {
               <div className="mt-3 grid grid-cols-5 gap-2">
                 {product.images.map((img, i) => (
                   <button
-                    key={img.id} type="button" onClick={() => setActive(i)}
+                    key={img.product_image_id} type="button" onClick={() => setActive(i)}
                     className={`aspect-square animate-scaleIn overflow-hidden rounded-lg border-2 transition-all duration-200 ${
                       i === active ? 'border-brand-500 ring-2 ring-brand-500/25' : 'border-transparent opacity-60 hover:opacity-100'
                     }`}
@@ -161,7 +161,7 @@ export default function QuickViewModal({ productId, open, onClose }) {
                   </button>
                 </div>
               )}
-              <Link to={`/products/${product.id}`} onClick={onClose} className="mt-3 block text-center text-sm font-medium text-brand-600 hover:underline">
+              <Link to={`/products/${product.product_id}`} onClick={onClose} className="mt-3 block text-center text-sm font-medium text-brand-600 hover:underline">
                 View full details →
               </Link>
             </div>

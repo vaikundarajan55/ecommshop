@@ -13,7 +13,9 @@ const verifyToken = (req, res, next) => {
     if (err) {
       return res.status(403).json({ success: false, message: 'Invalid or expired token' });
     }
-    req.user = decoded; // { id, email, role }
+    // { user_id, email, role } - tokens issued before the users.id -> users.user_id rename carry `id`
+    const { id, ...rest } = decoded;
+    req.user = { ...rest, user_id: decoded.user_id ?? id };
     next();
   });
 };

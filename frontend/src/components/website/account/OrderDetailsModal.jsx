@@ -98,7 +98,7 @@ export default function OrderDetailsModal({ orderId, open, onClose, onChanged })
                     <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">History</p>
                     <ul className="max-h-36 space-y-1.5 overflow-y-auto pr-1 text-xs">
                       {order.tracking.slice().reverse().map((t) => (
-                        <li key={t.id} className="flex flex-wrap gap-x-2 text-gray-500">
+                        <li key={t.order_tracking_id} className="flex flex-wrap gap-x-2 text-gray-500">
                           <span className="font-medium text-gray-700">{statusLabel(t.status)}</span>
                           <span>{new Date(t.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}</span>
                           {t.note && <span className="w-full text-gray-400">{t.note}</span>}
@@ -115,7 +115,7 @@ export default function OrderDetailsModal({ orderId, open, onClose, onChanged })
                   <h3 className="mb-2 text-sm font-semibold text-gray-900">Items</h3>
                   <ul className="divide-y divide-gray-100 rounded-lg ring-1 ring-gray-100">
                     {order.items?.map((it) => (
-                      <li key={it.id} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
+                      <li key={it.order_item_id} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
                         <span className="min-w-0 truncate text-gray-700">{it.product_name} <span className="text-gray-400">× {it.quantity}</span></span>
                         <span className="font-medium tabular-nums text-gray-900">{money(it.subtotal)}</span>
                       </li>

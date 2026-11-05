@@ -13,7 +13,7 @@ import StatusBadge from '../../components/admin/common/StatusBadge';
 import Thumb from '../../components/admin/common/Thumb';
 import { nameError, findDuplicate } from '../../utils/validators';
 
-const emptyForm = { id: null, name: '', status: 'active', image: null, existingImage: null };
+const emptyForm = { category_id: null, name: '', status: 'active', image: null, existingImage: null };
 
 export default function Category() {
   const dispatch = useDispatch();
@@ -28,13 +28,13 @@ export default function Category() {
 
   const openCreate = () => { setForm(emptyForm); setErrors({}); setModalOpen(true); };
   const openEdit = (row) => {
-    setForm({ id: row.id, name: row.name, status: row.status, image: null, existingImage: row.image });
+    setForm({ category_id: row.category_id, name: row.name, status: row.status, image: null, existingImage: row.image });
     setErrors({});
     setModalOpen(true);
   };
 
   // Shown while typing: server error, or another category already using this name
-  const duplicate = findDuplicate(categories, form.name, form.id);
+  const duplicate = findDuplicate(categories, form.name, form.category_id, 'category_id');
   const nameProblem = errors.name || (duplicate ? `A category named "${duplicate.name}" already exists` : '');
 
   const handleSubmit = async (e) => {
@@ -45,7 +45,7 @@ export default function Category() {
       return notify.error(problem);
     }
     try {
-      if (form.id) {
+      if (form.category_id) {
         await dispatch(updateCategory(form)).unwrap();
         notify.updated('Category updated successfully');
       } else {
@@ -63,7 +63,7 @@ export default function Category() {
     const ok = await confirmDialog({
       title: 'Delete category?',
       message: `"${row.name}" and its subcategories will be permanently deleted. This cannot be undone.`,
-      onConfirm: () => dispatch(deleteCategory(row.id)).unwrap(),
+      onConfirm: () => dispatch(deleteCategory(row.category_id)).unwrap(),
     });
     if (!ok) return;
     notify.deleted(`Category "${row.name}" deleted successfully`);
@@ -79,8 +79,9 @@ export default function Category() {
       </div>
 
       <DataTable
+        rowKey="category_id"
         columns={[
-          { key: 'id', label: 'ID' },
+          { key: 'category_id', label: 'ID' },
           { key: 'image', label: 'Image', render: (row) => <Thumb src={row.image} alt={row.name} /> },
           { key: 'name', label: 'Name' },
           { key: 'status', label: 'Status', render: (row) => <StatusBadge status={row.status} /> },
@@ -96,7 +97,7 @@ export default function Category() {
         )}
       />
 
-      <Modal open={modalOpen} title={form.id ? 'Edit Category' : 'Add Category'} onClose={() => setModalOpen(false)}>
+      <Modal open={modalOpen} title={form.category_id ? 'Edit Category' : 'Add Category'} onClose={() => setModalOpen(false)}>
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-600">Name</label>

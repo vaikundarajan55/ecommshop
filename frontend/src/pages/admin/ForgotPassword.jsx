@@ -49,7 +49,7 @@ export default function ForgotPassword() {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-5">
           <AuthInput label="Admin email" icon={Mail} type="email" required autoComplete="username" accent="primary" delay={80}
-            placeholder="admin@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+            placeholder="admin@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} />
           <button
             disabled={loading}
             className="flex w-full animate-fadeInUp items-center justify-center gap-2 rounded-md bg-primary-600 py-2.5 text-sm font-semibold text-white disabled:opacity-60"

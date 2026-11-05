@@ -87,7 +87,7 @@ function InvoiceDocument({ order }) {
             </thead>
             <tbody>
               {items.map((it, i) => (
-                <tr key={it.id ?? i} className="animate-fadeInUp border-b border-gray-100 odd:bg-white even:bg-gray-50/70" style={{ animationDelay: `${350 + i * 70}ms` }}>
+                <tr key={it.order_item_id ?? i} className="animate-fadeInUp border-b border-gray-100 odd:bg-white even:bg-gray-50/70" style={{ animationDelay: `${350 + i * 70}ms` }}>
                   <td className="px-3 py-2.5 text-gray-400">{i + 1}</td>
                   <td className="px-3 py-2.5 font-medium text-gray-800">{it.product_name}</td>
                   <td className="px-3 py-2.5 text-right tabular-nums">{it.quantity}</td>
@@ -146,10 +146,10 @@ export default function InvoiceModal({ api, order, open, onClose }) {
     let cancelled = false;
     setView('invoice'); setDetails(null); setPdfUrl(null); setError('');
 
-    api.get(`/orders/${order.id}`)
+    api.get(`/orders/${order.order_id}`)
       .then(({ data }) => { if (!cancelled) setDetails(data.data); })
       .catch(() => { if (!cancelled) setError('Could not load the invoice. Please try again.'); });
-    api.get(`/orders/${order.id}/invoice`, { responseType: 'blob' })
+    api.get(`/orders/${order.order_id}/invoice`, { responseType: 'blob' })
       .then((res) => {
         if (cancelled) return;
         objectUrl = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
@@ -158,7 +158,7 @@ export default function InvoiceModal({ api, order, open, onClose }) {
       .catch(() => {});
 
     return () => { cancelled = true; if (objectUrl) URL.revokeObjectURL(objectUrl); };
-  }, [open, order?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [open, order?.order_id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const download = () => {
     const a = document.createElement('a');
@@ -215,7 +215,7 @@ export default function InvoiceModal({ api, order, open, onClose }) {
             <FileWarning size={32} /> {error}
           </div>
         ) : view === 'invoice' ? (
-          details ? <InvoiceDocument key={details.id} order={details} /> : (
+          details ? <InvoiceDocument key={details.order_id} order={details} /> : (
             <div className="flex h-72 flex-col items-center justify-center gap-2 text-sm text-gray-500">
               <Loader2 size={28} className="animate-spin text-primary-600" /> Preparing invoice...
             </div>

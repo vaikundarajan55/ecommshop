@@ -110,7 +110,7 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2">
-              {list.slice(0, 4).map((o, i) => <OrderCard key={o.id} order={o} index={i} onClick={() => setOpenId(o.id)} />)}
+              {list.slice(0, 4).map((o, i) => <OrderCard key={o.order_id} order={o} index={i} onClick={() => setOpenId(o.order_id)} />)}
             </div>
           )}
         </section>

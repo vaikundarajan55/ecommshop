@@ -36,7 +36,7 @@ export const createSubcategory = createAsyncThunk('subcategories/create', async 
 
 export const updateSubcategory = createAsyncThunk('subcategories/update', async (sub, { dispatch, rejectWithValue }) => {
   try {
-    const { data } = await adminApi.put(`/subcategories/${sub.id}`, toFormData(sub));
+    const { data } = await adminApi.put(`/subcategories/${sub.subcategory_id}`, toFormData(sub));
     dispatch(fetchSubcategories());
     return data;
   } catch (err) {
@@ -69,7 +69,7 @@ const subcategorySlice = createSlice({
       .addCase(fetchSubcategories.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
       .addCase(deleteSubcategory.fulfilled, (state, action) => {
-        state.items = state.items.filter((s) => s.id !== action.payload);
+        state.items = state.items.filter((s) => s.subcategory_id !== action.payload);
       });
 
     [createSubcategory, updateSubcategory].forEach((thunk) => {

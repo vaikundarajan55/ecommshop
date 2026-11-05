@@ -131,7 +131,7 @@ export default function ChatAssistant() {
               </div>
             </div>
           ) : (
-            messages.map((m) => <Bubble key={m.id} msg={m} initials={initials} />)
+            messages.map((m) => <Bubble key={m.chat_message_id} msg={m} initials={initials} />)
           )}
           <div ref={endRef} />
         </div>

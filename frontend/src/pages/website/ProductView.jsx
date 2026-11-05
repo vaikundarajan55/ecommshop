@@ -9,6 +9,7 @@ import { addToCart } from '../../store/slices/website/cartSlice';
 import { fetchProductById } from '../../store/slices/website/catalogSlice';
 import { imageUrl } from '../../utils/imageUrl';
 import useSeo from '../../hooks/useSeo';
+import useLiveContent from '../../hooks/useLiveContent';
 import PageHero from '../../components/website/common/PageHero';
 
 const money = (v) => `₹${Number(v || 0).toLocaleString('en-IN')}`;
@@ -30,6 +31,12 @@ export default function ProductView() {
       .then(() => setLoaded(true))
       .catch(() => setNotFound(true));
   }, [dispatch, id]);
+
+  // Admin saved this product (price, stock, images...) or its category: reload in place
+  useLiveContent(['products', 'categories', 'subcategories'], (e) => {
+    if (e.type === 'products' && e.id !== null && String(e.id) !== String(id)) return;
+    dispatch(fetchProductById(id)).unwrap().catch(() => setNotFound(true)); // deleted / deactivated
+  });
 
   // Product structured data lets search engines show price/stock in results
   const images = (product?.images || []).map((i) => imageUrl(i.image));
@@ -53,7 +60,7 @@ export default function ProductView() {
         price: Number(product.discount_price || product.price).toFixed(2),
         availability: Number(product.stock) > 0 && product.status === 'active'
           ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-        url: `${window.location.origin}/products/${product.id}`,
+        url: `${window.location.origin}/products/${product.product_id}`,
       },
     },
   });
@@ -85,7 +92,7 @@ export default function ProductView() {
     ? Math.round((1 - Number(product.discount_price) / Number(product.price)) * 100) : 0;
 
   const handleAdd = () => {
-    dispatch(addToCart({ productId: product.id, name: product.name, price, quantity: qty, image: product.images[0]?.image || null }));
+    dispatch(addToCart({ productId: product.product_id, name: product.name, price, quantity: qty, image: product.images[0]?.image || null }));
     notify.created(`${qty} × ${product.name} added to cart`);
     setJustAdded(true);
     setTimeout(() => setJustAdded(false), 2000);

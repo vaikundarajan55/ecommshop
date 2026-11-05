@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import adminApi from '../../../services/adminApi';
-import { errorMessage } from '../../../utils/notify';
+import { errorMessage, formError } from '../../../utils/notify';
+import { clean } from '../../../utils/validators';
 
 // Admin > Contact Us (shop details). One record: only fetched and updated.
 
@@ -9,6 +10,14 @@ export const SHOP_FIELDS = [
   'address_line', 'city', 'state', 'pincode', 'country', 'map_url', 'opening_hours', 'gstin',
   'facebook_url', 'instagram_url', 'twitter_url', 'youtube_url', 'whatsapp',
 ];
+const MULTI_LINE = ['description', 'opening_hours']; // keep their line breaks
+
+const toFormData = (shop) => {
+  const fd = new FormData();
+  SHOP_FIELDS.forEach((k) => fd.append(k, MULTI_LINE.includes(k) ? shop[k] ?? '' : clean(shop[k])));
+  if (shop.logo) fd.append('logo', shop.logo);
+  return fd;
+};
 
 export const fetchShopSettings = createAsyncThunk('shopSettings/fetch', async (_, { rejectWithValue }) => {
   try {
@@ -19,15 +28,13 @@ export const fetchShopSettings = createAsyncThunk('shopSettings/fetch', async (_
   }
 });
 
+// Rejects with { message, errors }, same as Category
 export const updateShopSettings = createAsyncThunk('shopSettings/update', async (shop, { rejectWithValue }) => {
   try {
-    const fd = new FormData();
-    SHOP_FIELDS.forEach((k) => fd.append(k, shop[k]));
-    if (shop.logo) fd.append('logo', shop.logo);
-    const { data } = await adminApi.put('/cms/shop', fd);
+    const { data } = await adminApi.put('/cms/shop', toFormData(shop));
     return data.data;
   } catch (err) {
-    return rejectWithValue(errorMessage(err, 'Update failed'));
+    return rejectWithValue(formError(err, 'Update failed'));
   }
 });
 
@@ -48,7 +55,7 @@ const shopSettingsSlice = createSlice({
 
       .addCase(updateShopSettings.pending, (state) => { state.saving = true; state.error = null; })
       .addCase(updateShopSettings.fulfilled, (state, action) => { state.saving = false; state.data = action.payload; })
-      .addCase(updateShopSettings.rejected, (state, action) => { state.saving = false; state.error = action.payload; });
+      .addCase(updateShopSettings.rejected, (state, action) => { state.saving = false; state.error = action.payload?.message; });
   },
 });
 

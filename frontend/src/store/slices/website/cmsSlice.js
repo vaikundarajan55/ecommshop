@@ -31,7 +31,8 @@ export const fetchShop = createAsyncThunk('cms/fetchShop', async (_, { rejectWit
     return rejectWithValue(errorMessage(err));
   }
 }, {
-  condition: (_, { getState }) => getState().cms.shopStatus === 'idle', // load once, shared by every component
+  // load once, shared by every component; { force: true } reloads after an admin edit (live update)
+  condition: (arg, { getState }) => arg?.force || getState().cms.shopStatus === 'idle',
 });
 
 export const fetchAbout = createAsyncThunk('cms/fetchAbout', async (_, { rejectWithValue }) => {

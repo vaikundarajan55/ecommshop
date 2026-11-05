@@ -2,7 +2,7 @@
 
 A full-stack ecommerce project: separate **admin** and **website** React/Vite/Tailwind
 frontends, a Node.js (Express, MVC pattern) backend with Socket.IO real-time order
-tracking and MySQL (incl. stored procedures), and a Python AI microservice that
+tracking and MySQL, and a Python AI microservice that
 predicts delivery windows and flags order-tracking anomalies.
 
 ## Folder Structure
@@ -13,7 +13,7 @@ ecommerce-project/
 │   └── website/        # React + Vite + Tailwind — customer-facing storefront
 ├── backend/
 │   ├── src/             # Express app: config, controllers, models, routes, middlewares, sockets, utils
-│   └── database/        # schema.sql, procedures.sql, seed.sql
+│   └── database/        # schema.sql (complete database: tables, data)
 ├── python-ai-service/   # FastAPI service: delivery prediction + anomaly detection
 └── docs/                 # Setup guide, API docs, DB schema notes
 ```
@@ -21,7 +21,7 @@ ecommerce-project/
 ## Stack
 - **Frontend (admin + website):** React 18, Vite, Tailwind CSS, Redux Toolkit, Axios, Socket.IO client
 - **Backend:** Node.js, Express (MVC), Socket.IO, MySQL (mysql2), JWT auth, Multer uploads, PDFKit invoices
-- **Database:** MySQL 8+ with stored procedures for listing/reporting
+- **Database:** MySQL 8+ (plain parameterized queries via mysql2)
 - **AI service:** Python, FastAPI, scikit-learn-ready (ships with a heuristic fallback model)
 
 ## Admin Panel Pages
@@ -50,7 +50,7 @@ rule-based fallback so it works immediately — swap in a trained model later (s
 ## Getting Started
 See `docs/SETUP_GUIDE.md` for step-by-step install/run instructions,
 `docs/API_DOCUMENTATION.md` for all REST endpoints and Socket.IO events, and
-`docs/DATABASE_SCHEMA.md` for the schema + stored procedures.
+`docs/DATABASE_SCHEMA.md` for the schema.
 
 ## Notes / Next Steps
 - Wire a real email provider (nodemailer/SES) into `authController.forgotPassword` to

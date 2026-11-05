@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
@@ -24,7 +25,9 @@ export default function AdminLayout() {
           <Topbar />
           <main className="flex-1 p-4 sm:p-6">
             <div key={location.pathname} className="animate-fadeInUp">
-              <Outlet />
+              <Suspense fallback={<div className="p-12 text-center text-slate-500">Loading...</div>}>
+                <Outlet />
+              </Suspense>
             </div>
           </main>
           <Footer />

@@ -1,10 +1,19 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import adminApi from '../../../services/adminApi';
-import { errorMessage } from '../../../utils/notify';
+import { errorMessage, formError } from '../../../utils/notify';
+import { clean } from '../../../utils/validators';
 
 // Admin > About Page. One record: only fetched and updated.
 
 export const ABOUT_FIELDS = ['title', 'subtitle', 'heading', 'content', 'mission', 'vision'];
+const SINGLE_LINE = ['title', 'subtitle', 'heading']; // the rest keep their line breaks
+
+const toFormData = (about) => {
+  const fd = new FormData();
+  ABOUT_FIELDS.forEach((k) => fd.append(k, SINGLE_LINE.includes(k) ? clean(about[k]) : about[k] ?? ''));
+  if (about.image) fd.append('image', about.image);
+  return fd;
+};
 
 export const fetchAbout = createAsyncThunk('about/fetch', async (_, { rejectWithValue }) => {
   try {
@@ -15,15 +24,13 @@ export const fetchAbout = createAsyncThunk('about/fetch', async (_, { rejectWith
   }
 });
 
+// Rejects with { message, errors }, same as Category
 export const updateAbout = createAsyncThunk('about/update', async (about, { rejectWithValue }) => {
   try {
-    const fd = new FormData();
-    ABOUT_FIELDS.forEach((k) => fd.append(k, about[k]));
-    if (about.image) fd.append('image', about.image);
-    const { data } = await adminApi.put('/cms/about', fd);
+    const { data } = await adminApi.put('/cms/about', toFormData(about));
     return data.data;
   } catch (err) {
-    return rejectWithValue(errorMessage(err, 'Update failed'));
+    return rejectWithValue(formError(err, 'Update failed'));
   }
 });
 
@@ -44,7 +51,7 @@ const aboutSlice = createSlice({
 
       .addCase(updateAbout.pending, (state) => { state.saving = true; state.error = null; })
       .addCase(updateAbout.fulfilled, (state, action) => { state.saving = false; state.data = action.payload; })
-      .addCase(updateAbout.rejected, (state, action) => { state.saving = false; state.error = action.payload; });
+      .addCase(updateAbout.rejected, (state, action) => { state.saving = false; state.error = action.payload?.message; });
   },
 });
 

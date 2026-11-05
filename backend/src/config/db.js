@@ -15,15 +15,6 @@ const pool = mysql.createPool({
   dateStrings: true,
 });
 
-// Helper to call a stored procedure: callProcedure('sp_name', [param1, param2])
-const callProcedure = async (procName, params = []) => {
-  const placeholders = params.map(() => '?').join(',');
-  const sql = `CALL ${procName}(${placeholders})`;
-  const [rows] = await pool.query(sql, params);
-  // Stored procedures return an array of resultsets; first one is usually the data
-  return rows[0];
-};
-
 const testConnection = async () => {
   try {
     const conn = await pool.getConnection();
@@ -35,4 +26,4 @@ const testConnection = async () => {
   }
 };
 
-module.exports = { pool, callProcedure, testConnection };
+module.exports = { pool, testConnection };

@@ -1,14 +1,16 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import adminApi from '../../../services/adminApi';
 import siteApi from '../../../services/siteApi';
-import { errorMessage } from '../../../utils/notify';
+import { errorMessage, formError } from '../../../utils/notify';
+import { clean } from '../../../utils/validators';
 
 // Home page slides. `active` feeds the website slider, `items` feeds Admin > Banners.
 
 // Banner fields -> multipart body (the image is optional on update)
 const toFormData = (banner) => {
   const fd = new FormData();
-  ['title', 'subtitle', 'button_text', 'button_link', 'sort_order', 'status'].forEach((k) => fd.append(k, banner[k] ?? ''));
+  ['title', 'subtitle', 'button_text', 'button_link'].forEach((k) => fd.append(k, clean(banner[k])));
+  ['sort_order', 'status'].forEach((k) => fd.append(k, banner[k] ?? ''));
   if (banner.image) fd.append('image', banner.image);
   return fd;
 };
@@ -33,24 +35,25 @@ export const fetchAllBanners = createAsyncThunk('banners/fetchAll', async (_, { 
   }
 });
 
-// The API only returns the new id, so the list is reloaded afterwards
+// The API only returns the new id, so the list is reloaded afterwards.
+// Create / update reject with { message, errors }, same as Category.
 export const createBanner = createAsyncThunk('banners/create', async (banner, { dispatch, rejectWithValue }) => {
   try {
     const { data } = await adminApi.post('/cms/banners', toFormData(banner));
     dispatch(fetchAllBanners());
     return data;
   } catch (err) {
-    return rejectWithValue(errorMessage(err));
+    return rejectWithValue(formError(err));
   }
 });
 
 export const updateBanner = createAsyncThunk('banners/update', async (banner, { dispatch, rejectWithValue }) => {
   try {
-    const { data } = await adminApi.put(`/cms/banners/${banner.id}`, toFormData(banner));
+    const { data } = await adminApi.put(`/cms/banners/${banner.banner_id}`, toFormData(banner));
     dispatch(fetchAllBanners());
     return data;
   } catch (err) {
-    return rejectWithValue(errorMessage(err));
+    return rejectWithValue(formError(err));
   }
 });
 
@@ -83,8 +86,8 @@ const bannerSlice = createSlice({
       .addCase(fetchAllBanners.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
       .addCase(deleteBanner.fulfilled, (state, action) => {
-        state.items = state.items.filter((b) => b.id !== action.payload);
-        state.active = state.active.filter((b) => b.id !== action.payload);
+        state.items = state.items.filter((b) => b.banner_id !== action.payload);
+        state.active = state.active.filter((b) => b.banner_id !== action.payload);
       });
 
     // create + update share the saving flag
@@ -92,7 +95,7 @@ const bannerSlice = createSlice({
       builder
         .addCase(thunk.pending, (state) => { state.saving = true; state.error = null; })
         .addCase(thunk.fulfilled, (state) => { state.saving = false; })
-        .addCase(thunk.rejected, (state, action) => { state.saving = false; state.error = action.payload; });
+        .addCase(thunk.rejected, (state, action) => { state.saving = false; state.error = action.payload?.message; });
     });
   },
 });

@@ -6,6 +6,7 @@ import { fetchProducts, fetchActiveCategories } from '../../store/slices/website
 import ProductCard from '../../components/website/common/ProductCard';
 import PageHero from '../../components/website/common/PageHero';
 import useSeo from '../../hooks/useSeo';
+import useLiveContent from '../../hooks/useLiveContent';
 
 export default function ProductList() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -14,7 +15,7 @@ export default function ProductList() {
   const [search, setSearch] = useState('');
 
   const categoryId = searchParams.get('categoryId') || '';
-  const categoryName = categories.find((c) => String(c.id) === String(categoryId))?.name;
+  const categoryName = categories.find((c) => String(c.category_id) === String(categoryId))?.name;
   useSeo({
     title: categoryName ? `${categoryName} - Shop online` : 'All products',
     description: categoryName
@@ -27,6 +28,12 @@ export default function ProductList() {
 
   useEffect(() => { load(); }, [categoryId]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { dispatch(fetchActiveCategories()); }, [dispatch]);
+
+  // Admin edits show up live, without the loading skeletons
+  useLiveContent(['products', 'categories', 'subcategories'], ({ type }) => {
+    dispatch(fetchProducts({ categoryId, search, silent: true }));
+    if (type === 'categories') dispatch(fetchActiveCategories({ silent: true }));
+  });
 
   const pickCategory = (id) => setSearchParams(id ? { categoryId: id } : {});
   const clearSearch = () => { setSearch(''); load(''); };
@@ -72,8 +79,8 @@ export default function ProductList() {
           <button role="tab" aria-selected={!categoryId} onClick={() => pickCategory('')} className={chipCls(!categoryId)}>All</button>
           {categories.map((c, i) => (
             <button
-              key={c.id} role="tab" aria-selected={String(c.id) === categoryId}
-              onClick={() => pickCategory(String(c.id))} className={chipCls(String(c.id) === categoryId)}
+              key={c.category_id} role="tab" aria-selected={String(c.category_id) === categoryId}
+              onClick={() => pickCategory(String(c.category_id))} className={chipCls(String(c.category_id) === categoryId)}
               style={{ animationDelay: `${(i + 1) * 50}ms` }}
             >
               {c.name}
@@ -92,7 +99,7 @@ export default function ProductList() {
             ? Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="aspect-[3/4] animate-shimmer rounded-xl bg-gradient-to-r from-gray-100 via-white to-gray-100 bg-[length:200%_100%]" />
             ))
-            : products.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)}
+            : products.map((p, i) => <ProductCard key={p.product_id} product={p} index={i} />)}
         </div>
 
         {!loading && products.length === 0 && (

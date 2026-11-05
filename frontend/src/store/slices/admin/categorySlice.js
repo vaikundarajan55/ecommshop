@@ -35,7 +35,7 @@ export const createCategory = createAsyncThunk('categories/create', async (categ
 
 export const updateCategory = createAsyncThunk('categories/update', async (category, { dispatch, rejectWithValue }) => {
   try {
-    const { data } = await adminApi.put(`/categories/${category.id}`, toFormData(category));
+    const { data } = await adminApi.put(`/categories/${category.category_id}`, toFormData(category));
     dispatch(fetchCategories());
     return data;
   } catch (err) {
@@ -68,7 +68,7 @@ const categorySlice = createSlice({
       .addCase(fetchCategories.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
       .addCase(deleteCategory.fulfilled, (state, action) => {
-        state.items = state.items.filter((c) => c.id !== action.payload);
+        state.items = state.items.filter((c) => c.category_id !== action.payload);
       });
 
     [createCategory, updateCategory].forEach((thunk) => {

@@ -36,7 +36,7 @@ const myOrderSlice = createSlice({
       .addCase(fetchMyOrders.fulfilled, (state, action) => { state.items = action.payload; state.error = null; })
       .addCase(fetchMyOrders.rejected, (state, action) => { state.items = state.items || []; state.error = action.payload; })
 
-      .addCase(fetchMyOrderById.fulfilled, (state, action) => { state.details[action.payload.id] = action.payload; })
+      .addCase(fetchMyOrderById.fulfilled, (state, action) => { state.details[action.payload.order_id] = action.payload; })
 
       // Another customer may sign in next - drop the previous one's orders
       .addCase(logout, (state) => { state.items = null; state.details = {}; state.error = null; });

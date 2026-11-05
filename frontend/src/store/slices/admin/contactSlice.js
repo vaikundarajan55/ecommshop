@@ -47,11 +47,11 @@ const contactSlice = createSlice({
       .addCase(fetchContacts.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
       .addCase(updateContactStatus.fulfilled, (state, action) => {
-        const msg = state.items.find((m) => m.id === action.payload.id);
+        const msg = state.items.find((m) => m.contact_message_id === action.payload.id);
         if (msg) msg.status = action.payload.status;
       })
       .addCase(deleteContact.fulfilled, (state, action) => {
-        state.items = state.items.filter((m) => m.id !== action.payload);
+        state.items = state.items.filter((m) => m.contact_message_id !== action.payload);
       });
   },
 });

@@ -11,6 +11,7 @@ import TestimonialsSection from '../../components/website/home/TestimonialsSecti
 import CategorySlider from '../../components/website/home/CategorySlider';
 import Carousel from '../../components/website/home/Carousel';
 import useSeo from '../../hooks/useSeo';
+import useLiveContent from '../../hooks/useLiveContent';
 import { fetchActiveBanners } from '../../store/slices/website/bannerSlice';
 import { fetchFeaturedProducts, fetchCurrentProducts, fetchActiveCategories } from '../../store/slices/website/catalogSlice';
 import { fetchTestimonials } from '../../store/slices/website/cmsSlice';
@@ -64,6 +65,17 @@ export default function Home() {
     dispatch(fetchCurrentProducts());
   }, [dispatch]);
 
+  // Admin edits show up live, without the loading skeletons
+  useLiveContent(['products', 'categories', 'subcategories', 'banners', 'testimonials'], ({ type }) => {
+    if (type === 'banners') dispatch(fetchActiveBanners());
+    else if (type === 'testimonials') dispatch(fetchTestimonials());
+    else {
+      dispatch(fetchFeaturedProducts({ silent: true }));
+      dispatch(fetchCurrentProducts());
+      if (type === 'categories') dispatch(fetchActiveCategories({ silent: true }));
+    }
+  });
+
   // Up to 3 product images float in the hero
   const heroImages = products.filter((p) => p.primary_image).slice(0, 3);
   const HERO_SLOTS = [
@@ -106,7 +118,7 @@ export default function Home() {
           <div className="relative mx-auto hidden h-80 w-full max-w-md sm:block">
             {heroImages.length ? heroImages.map((p, i) => (
               <Link
-                key={p.id} to={`/products/${p.id}`}
+                key={p.product_id} to={`/products/${p.product_id}`}
                 className={`absolute animate-float overflow-hidden rounded-2xl border-4 border-white bg-white shadow-2xl transition-transform duration-300 hover:z-10 hover:scale-105 ${HERO_SLOTS[i]}`}
               >
                 <img src={imageUrl(p.primary_image)} alt={p.name} className="h-full w-full animate-scaleIn object-cover" style={{ animationDelay: `${300 + i * 150}ms` }} />
@@ -157,7 +169,7 @@ export default function Home() {
           </div>
         ) : (
           <Carousel
-            items={products} getKey={(p) => p.id} label="featured products" dotLabel={(p) => p.name} interval={3500}
+            items={products} getKey={(p) => p.product_id} label="featured products" dotLabel={(p) => p.name} interval={3500}
             renderItem={(p, i) => <ProductCard product={p} index={i} />}
           />
         )}
@@ -170,7 +182,7 @@ export default function Home() {
           <div className="mx-auto max-w-6xl px-4">
             <SectionTitle title="Current Products" to="/products" linkText="Shop all" />
             <Carousel
-              items={currentProducts} getKey={(p) => p.id} label="current products" dotLabel={(p) => p.name} interval={4000}
+              items={currentProducts} getKey={(p) => p.product_id} label="current products" dotLabel={(p) => p.name} interval={4000}
               renderItem={(p, i) => <ProductCard product={p} index={i} />}
             />
           </div>

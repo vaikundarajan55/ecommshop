@@ -8,7 +8,7 @@ export const fetchVisitors = createAsyncThunk('visitors/fetchAll', async (_, { r
   try {
     const [{ data }, { data: recent }] = await Promise.all([adminApi.get('/visitors'), adminApi.get('/visitors/recent')]);
     return {
-      ips: data.data.map((r) => ({ ...r, id: r.ip })),
+      ips: data.data,
       stats: data.stats || {},
       serverIp: data.server_ip || '',
       views: recent.data,

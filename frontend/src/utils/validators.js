@@ -27,9 +27,10 @@ export function nameError(value, label = 'Name') {
 }
 
 // Case/space-insensitive clash with another row in `list` (excluding the row being edited)
-export const findDuplicate = (list, name, excludeId, extra = () => true) => {
+// idKey: the list's primary key column ('category_id', 'product_id', ...)
+export const findDuplicate = (list, name, excludeId, idKey, extra = () => true) => {
   const key = clean(name).toLowerCase();
-  return key ? list.find((r) => r.id !== excludeId && clean(r.name).toLowerCase() === key && extra(r)) : undefined;
+  return key ? list.find((r) => r[idKey] !== excludeId && clean(r.name).toLowerCase() === key && extra(r)) : undefined;
 };
 
 export function personNameError(value) {

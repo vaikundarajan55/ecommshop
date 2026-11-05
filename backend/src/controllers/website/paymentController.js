@@ -1,13 +1,13 @@
-// src/controllers/paymentController.js
+// src/controllers/website/paymentController.js
 // Razorpay online payments for the website Payment page:
 //   1. POST /payments/razorpay/order   -> prices the cart on the server, creates a Razorpay order
 //   2. Browser opens Razorpay Checkout, customer pays
 //   3. POST /payments/razorpay/verify  -> checks the signature + payment with Razorpay, then creates the shop order
-const { pool } = require('../config/db');
-const { OrderModel, CartError } = require('../models/orderModel');
-const PaymentMethodModel = require('../models/paymentMethodModel');
-const ShopModel = require('../models/shopModel');
-const razorpay = require('../utils/razorpay');
+const { pool } = require('../../config/db');
+const { OrderModel, CartError } = require('../../models/website/orderModel');
+const PaymentMethodModel = require('../../models/website/paymentMethodModel');
+const ShopModel = require('../../models/website/shopModel');
+const razorpay = require('../../utils/razorpay');
 const { afterOrderPlaced } = require('./orderController');
 
 const ONLINE_METHODS = ['card', 'upi', 'netbanking', 'wallet'];
@@ -42,15 +42,15 @@ exports.createRazorpayOrder = async (req, res, next) => {
       ? { id: razorpay.demoId('order') }
       : await razorpay.createOrder({
         amount,
-        receipt: `u${req.user.id}_${Date.now()}`, // max 40 chars
-        notes: { user_id: String(req.user.id) },
+        receipt: `u${req.user.user_id}_${Date.now()}`, // max 40 chars
+        notes: { user_id: String(req.user.user_id) },
       });
     await pool.query(
       'INSERT INTO razorpay_payments (user_id, razorpay_order_id, amount, payment_method, items) VALUES (?,?,?,?,?)',
-      [req.user.id, rzpOrder.id, total, paymentMethod, JSON.stringify(items)]
+      [req.user.user_id, rzpOrder.id, total, paymentMethod, JSON.stringify(items)]
     );
 
-    const [[user]] = await pool.query('SELECT name, email FROM users WHERE id = ?', [req.user.id]);
+    const [[user]] = await pool.query('SELECT name, email FROM users WHERE user_id = ?', [req.user.user_id]);
     const shop = await ShopModel.get().catch(() => null);
     res.status(201).json({
       success: true,
@@ -81,13 +81,13 @@ exports.verifyRazorpayPayment = async (req, res, next) => {
   try {
     const [[row]] = await pool.query(
       'SELECT * FROM razorpay_payments WHERE razorpay_order_id = ? AND user_id = ?',
-      [rzpOrderId, req.user.id]
+      [rzpOrderId, req.user.user_id]
     );
     if (!row) return res.status(404).json({ success: false, message: 'Payment not found' });
 
     // Already handled (double click / retried request) -> same answer again
     if (row.status === 'paid' && row.order_id) {
-      const [[order]] = await pool.query('SELECT order_no, total_amount FROM orders WHERE id = ?', [row.order_id]);
+      const [[order]] = await pool.query('SELECT order_no, total_amount FROM orders WHERE order_id = ?', [row.order_id]);
       return res.json({ success: true, data: { orderId: row.order_id, orderNo: order?.order_no, total: Number(row.amount), paymentId: row.razorpay_payment_id } });
     }
 
@@ -97,11 +97,11 @@ exports.verifyRazorpayPayment = async (req, res, next) => {
 
     // Only one request may turn this payment into an order
     const [claim] = await pool.query(
-      "UPDATE razorpay_payments SET status = 'processing', razorpay_payment_id = ? WHERE id = ? AND status IN ('created','failed')",
-      [paymentId, row.id]
+      "UPDATE razorpay_payments SET status = 'processing', razorpay_payment_id = ? WHERE payment_id = ? AND status IN ('created','failed')",
+      [paymentId, row.payment_id]
     );
     if (!claim.affectedRows) return res.status(409).json({ success: false, message: 'This payment is already being processed' });
-    claimed = row.id;
+    claimed = row.payment_id;
 
     // Double-check with Razorpay: right order, right amount, money actually taken
     const expected = razorpay.toPaise(row.amount);
@@ -118,17 +118,17 @@ exports.verifyRazorpayPayment = async (req, res, next) => {
     const method = ONLINE_METHODS.includes(payment.method) ? payment.method : row.payment_method; // what they actually paid with
     const totalAmount = Number(row.amount);
     const { orderId, orderNo } = await OrderModel.createOrder({
-      userId: req.user.id, items, shippingAddress, paymentMethod: method, totalAmount,
+      userId: req.user.user_id, items, shippingAddress, paymentMethod: method, totalAmount,
       paymentStatus: 'paid', transactionRef: paymentId,
     });
-    await pool.query("UPDATE razorpay_payments SET status = 'paid', order_id = ?, error = NULL WHERE id = ?", [orderId, row.id]);
+    await pool.query("UPDATE razorpay_payments SET status = 'paid', order_id = ?, error = NULL WHERE payment_id = ?", [orderId, row.payment_id]);
     await afterOrderPlaced({ orderId, orderNo, shippingAddress, itemCount: items.length, totalAmount });
 
     res.status(201).json({ success: true, message: 'Payment received - order placed', data: { orderId, orderNo, total: totalAmount, method, paymentId } });
   } catch (err) {
     if (claimed) {
       // Payment may have been taken - keep the payment id so admin can find it in the Razorpay dashboard
-      await pool.query("UPDATE razorpay_payments SET status = 'failed', error = ? WHERE id = ?", [String(err.message).slice(0, 255), claimed]).catch(() => {});
+      await pool.query("UPDATE razorpay_payments SET status = 'failed', error = ? WHERE payment_id = ?", [String(err.message).slice(0, 255), claimed]).catch(() => {});
       console.error('[Razorpay] verify:', err.message);
       return res.status(502).json({ success: false, message: `We could not confirm your payment. If money was deducted, please contact support with payment ID ${paymentId}.` });
     }
@@ -143,16 +143,16 @@ exports.demoPay = async (req, res, next) => {
     if (!razorpay.isDemo()) return res.status(404).json({ success: false, message: 'Not found' });
     const { razorpay_order_id: rzpOrderId, method, outcome } = req.body;
     const [[row]] = await pool.query(
-      "SELECT id FROM razorpay_payments WHERE razorpay_order_id = ? AND user_id = ? AND status IN ('created','failed')",
-      [rzpOrderId, req.user.id]
+      "SELECT payment_id FROM razorpay_payments WHERE razorpay_order_id = ? AND user_id = ? AND status IN ('created','failed')",
+      [rzpOrderId, req.user.user_id]
     );
     if (!row) return res.status(404).json({ success: false, message: 'Payment not found' });
 
     if (outcome === 'failure') {
-      await pool.query("UPDATE razorpay_payments SET status = 'failed', error = ? WHERE id = ?", ['Declined by bank (demo)', row.id]);
+      await pool.query("UPDATE razorpay_payments SET status = 'failed', error = ? WHERE payment_id = ?", ['Declined by bank (demo)', row.payment_id]);
       return res.status(402).json({ success: false, message: 'Payment declined by the bank (demo). Try again or pick another method.' });
     }
-    if (ONLINE_METHODS.includes(method)) await pool.query('UPDATE razorpay_payments SET payment_method = ? WHERE id = ?', [method, row.id]);
+    if (ONLINE_METHODS.includes(method)) await pool.query('UPDATE razorpay_payments SET payment_method = ? WHERE payment_id = ?', [method, row.payment_id]);
 
     const paymentId = razorpay.demoId('pay');
     res.json({
@@ -168,7 +168,7 @@ exports.razorpayFailed = async (req, res, next) => {
     const reason = String(req.body.error?.description || req.body.error || 'Payment failed').slice(0, 255);
     await pool.query(
       "UPDATE razorpay_payments SET status = 'failed', error = ? WHERE razorpay_order_id = ? AND user_id = ? AND status = 'created'",
-      [reason, req.body.razorpay_order_id, req.user.id]
+      [reason, req.body.razorpay_order_id, req.user.user_id]
     );
     res.json({ success: true });
   } catch (err) { next(err); }

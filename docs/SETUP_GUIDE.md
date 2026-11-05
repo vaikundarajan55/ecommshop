@@ -7,9 +7,8 @@
 
 ## 1. Database
 ```bash
-mysql -u root -p ecommerce_db_live < E:/reactlive/ecommercefull/backend/database/schema.sql
-mysql -u root -p ecommerce_db_live < E:/reactlive/ecommercefull/backend/database/procedures.sql
-mysql -u root -p ecommerce_db_live < E:/reactlive/ecommercefull/backend/database/seed.sql   # optional sample data
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS ecommerce_db_live CHARACTER SET utf8mb4"
+mysql -u root -p ecommerce_db_live < backend/database/schema.sql   # tables + data (one file)
 ```
 
 ## 2. Backend (Node.js / Express / Socket.IO)
@@ -38,7 +37,7 @@ cp .env.example .env
 npm install
 npm run dev                # http://localhost:5173
 ```
-Default seeded login: `admin@example.com` / `Admin@123` (change the seed hash before using in real life).
+Default admin login: `admin@gmail.com` / `Admin@123` (change it after the first login). Re-importing schema.sql replaces all tables and data.
 
 ## 5. Website (React + Vite + Tailwind)
 ```bash

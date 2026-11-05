@@ -12,7 +12,7 @@ import StatusBadge from '../../components/admin/common/StatusBadge';
 import Thumb from '../../components/admin/common/Thumb';
 import ActionButton, { ActionGroup } from '../../components/admin/common/ActionButton';
 
-const emptyForm = { id: null, title: '', subtitle: '', button_text: '', button_link: '', sort_order: 0, status: 'active', image: null, existingImage: null };
+const emptyForm = { banner_id: null, title: '', subtitle: '', button_text: '', button_link: '', sort_order: 0, status: 'active', image: null, existingImage: null };
 const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm';
 
 // How the banner will look on the website home page
@@ -62,7 +62,7 @@ export default function Banners() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (form.id) {
+      if (form.banner_id) {
         await dispatch(updateBanner(form)).unwrap();
         notify.updated('Banner updated successfully');
       } else {
@@ -70,8 +70,8 @@ export default function Banners() {
         notify.created('Banner added successfully');
       }
       setModalOpen(false);
-    } catch (message) {
-      notify.error(message);
+    } catch (err) {
+      notify.error(err.message);
     }
   };
 
@@ -79,7 +79,7 @@ export default function Banners() {
     const ok = await confirmDialog({
       title: 'Delete banner?',
       message: `"${row.title}" will be removed from the home page. This cannot be undone.`,
-      onConfirm: () => dispatch(deleteBanner(row.id)).unwrap(),
+      onConfirm: () => dispatch(deleteBanner(row.banner_id)).unwrap(),
     });
     if (!ok) return;
     notify.deleted(`Banner "${row.title}" deleted successfully`);
@@ -96,6 +96,7 @@ export default function Banners() {
       </div>
 
       <DataTable
+        rowKey="banner_id"
         columns={[
           { key: 'image', label: 'Image', render: (r) => <Thumb src={r.image} alt={r.title} size="h-10 w-16" /> },
           { key: 'title', label: 'Title', render: (r) => <span className="font-medium text-gray-800">{r.title}</span> },
@@ -114,7 +115,7 @@ export default function Banners() {
         )}
       />
 
-      <Modal open={modalOpen} size="max-w-2xl" title={form.id ? 'Edit Banner' : 'Add Banner'} onClose={() => setModalOpen(false)}>
+      <Modal open={modalOpen} size="max-w-2xl" title={form.banner_id ? 'Edit Banner' : 'Add Banner'} onClose={() => setModalOpen(false)}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="animate-fadeInUp">
             <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-400">Live preview</p>

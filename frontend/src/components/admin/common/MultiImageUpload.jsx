@@ -4,7 +4,7 @@ import { notify } from '../../../utils/notify';
 import { imageUrl } from '../../../utils/imageUrl';
 
 // Multi-image grid for products.
-//   existing        - saved images [{ id, image, is_primary }] (edit mode)
+//   existing        - saved images [{ product_image_id, image, is_primary }] (edit mode)
 //   files           - newly picked Files, uploaded on Save
 //   onFilesChange   - (files) => void
 //   onRemoveExisting / onSetPrimary - (image) => void, for saved images
@@ -65,7 +65,7 @@ export default function MultiImageUpload({ existing = [], files, onFilesChange, 
       <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
         {existing.map((img, idx) => (
           <div
-            key={`saved-${img.id}`}
+            key={`saved-${img.product_image_id}`}
             className={`group relative aspect-square animate-scaleIn overflow-hidden rounded-lg border-2 ${img.is_primary ? 'border-amber-400' : 'border-gray-200'}`}
             style={{ animationDelay: `${idx * 50}ms` }}
           >

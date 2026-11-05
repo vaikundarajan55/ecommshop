@@ -43,7 +43,7 @@ const userSlice = createSlice({
       .addCase(fetchUsers.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
       .addCase(updateUserStatus.fulfilled, (state, action) => {
-        const user = state.items.find((u) => u.id === action.payload.id);
+        const user = state.items.find((u) => u.user_id === action.payload.id);
         if (user) user.status = action.payload.status;
       });
   },

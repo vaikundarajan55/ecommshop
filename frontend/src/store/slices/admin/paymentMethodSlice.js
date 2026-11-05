@@ -13,8 +13,8 @@ export const fetchAllPaymentMethods = createAsyncThunk('paymentMethods/fetchAll'
   }
 });
 
-// arg: { id, name, description, sort_order, is_active }
-export const updatePaymentMethod = createAsyncThunk('paymentMethods/update', async ({ id, ...body }, { dispatch, rejectWithValue }) => {
+// arg: { payment_method_id, name, description, sort_order, is_active }
+export const updatePaymentMethod = createAsyncThunk('paymentMethods/update', async ({ payment_method_id: id, ...body }, { dispatch, rejectWithValue }) => {
   try {
     const { data } = await adminApi.put(`/payment-methods/${id}`, body);
     dispatch(fetchAllPaymentMethods());
@@ -55,7 +55,7 @@ const paymentMethodSlice = createSlice({
       .addCase(setDefaultPaymentMethod.fulfilled, (state) => { state.busyId = null; })
       .addCase(setDefaultPaymentMethod.rejected, (state, action) => { state.busyId = null; state.error = action.payload; })
 
-      .addCase(updatePaymentMethod.pending, (state, action) => { state.saving = true; state.busyId = action.meta.arg.id; state.error = null; })
+      .addCase(updatePaymentMethod.pending, (state, action) => { state.saving = true; state.busyId = action.meta.arg.payment_method_id; state.error = null; })
       .addCase(updatePaymentMethod.fulfilled, (state) => { state.saving = false; state.busyId = null; })
       .addCase(updatePaymentMethod.rejected, (state, action) => { state.saving = false; state.busyId = null; state.error = action.payload; });
   },

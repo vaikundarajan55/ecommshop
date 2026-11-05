@@ -1,10 +1,10 @@
-// src/controllers/chatController.js
+// src/controllers/website/chatController.js
 // Website AI assistant: answers a logged-in customer's questions about the shop, products and
 // THEIR OWN orders, using Google Gemini (free tier) or Claude. Replies stream to the browser
 // as Server-Sent Events.
 const Anthropic = require('@anthropic-ai/sdk').default;
-const { pool } = require('../config/db');
-const ShopModel = require('../models/shopModel');
+const { pool } = require('../../config/db');
+const ShopModel = require('../../models/website/shopModel');
 
 const MODEL = process.env.AI_CHAT_MODEL || 'claude-opus-5';
 // Short support answers don't need deep reasoning - 'low' keeps replies fast and cheap
@@ -63,8 +63,8 @@ async function storeContext() {
     .catch(() => [[]]);
   const [products] = await pool.query(
     `SELECT p.name, p.price, p.discount_price, p.stock, p.status, c.name AS category
-     FROM products p LEFT JOIN categories c ON c.id = p.category_id
-     WHERE p.status <> 'inactive' ORDER BY p.id DESC LIMIT 60`
+     FROM products p LEFT JOIN categories c ON c.category_id = p.category_id
+     WHERE p.status <> 'inactive' ORDER BY p.product_id DESC LIMIT 60`
   );
 
   const lines = ['<store>'];
@@ -92,19 +92,19 @@ async function storeContext() {
 
 // The logged-in customer's own details and recent orders only
 async function customerContext(userId) {
-  const [[user]] = await pool.query('SELECT name, email FROM users WHERE id = ?', [userId]);
+  const [[user]] = await pool.query('SELECT name, email FROM users WHERE user_id = ?', [userId]);
   const [orders] = await pool.query(
-    `SELECT id, order_no, total_amount, payment_method, payment_status, status, created_at
+    `SELECT order_id, order_no, total_amount, payment_method, payment_status, status, created_at
      FROM orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 10`,
     [userId]
   );
   const lines = ['<customer>', `Name: ${user?.name || 'Customer'}`, `Email: ${user?.email || ''}`, `Today: ${new Date().toDateString()}`];
   if (!orders.length) lines.push('Orders: none yet');
   for (const o of orders) {
-    const [items] = await pool.query('SELECT product_name, quantity FROM order_items WHERE order_id = ?', [o.id]);
+    const [items] = await pool.query('SELECT product_name, quantity FROM order_items WHERE order_id = ?', [o.order_id]);
     const [[eta]] = await pool.query(
       'SELECT predicted_delivery FROM order_tracking WHERE order_id = ? AND predicted_delivery IS NOT NULL ORDER BY created_at DESC LIMIT 1',
-      [o.id]
+      [o.order_id]
     );
     lines.push(
       `- Order #${o.order_no} placed ${new Date(o.created_at).toDateString()}: status ${label(o.status)}, ` +
@@ -120,8 +120,8 @@ async function customerContext(userId) {
 exports.history = async (req, res, next) => {
   try {
     const [rows] = await pool.query(
-      'SELECT id, role, content, created_at FROM chat_messages WHERE user_id = ? ORDER BY id DESC LIMIT 50',
-      [req.user.id]
+      'SELECT chat_message_id, role, content, created_at FROM chat_messages WHERE user_id = ? ORDER BY chat_message_id DESC LIMIT 50',
+      [req.user.user_id]
     );
     res.json({ success: true, data: rows.reverse() });
   } catch (err) { next(err); }
@@ -129,7 +129,7 @@ exports.history = async (req, res, next) => {
 
 exports.clear = async (req, res, next) => {
   try {
-    await pool.query('DELETE FROM chat_messages WHERE user_id = ?', [req.user.id]);
+    await pool.query('DELETE FROM chat_messages WHERE user_id = ?', [req.user.user_id]);
     res.json({ success: true, message: 'Chat cleared' });
   } catch (err) { next(err); }
 };
@@ -281,7 +281,7 @@ exports.send = async (req, res) => {
   const message = String(req.body.message ?? '').trim();
   if (!message) return res.status(400).json({ success: false, message: 'Please type a message' });
   if (message.length > MAX_MESSAGE_CHARS) return res.status(400).json({ success: false, message: `Please keep messages under ${MAX_MESSAGE_CHARS} characters` });
-  if (tooMany(req.user.id)) return res.status(429).json({ success: false, message: 'You are sending messages too quickly - please wait a few minutes' });
+  if (tooMany(req.user.user_id)) return res.status(429).json({ success: false, message: 'You are sending messages too quickly - please wait a few minutes' });
 
   const aborter = new AbortController();
   // Customer closed the chat mid-reply -> stop generating. (res, not req: req 'close' fires as soon
@@ -301,14 +301,14 @@ exports.send = async (req, res) => {
   const which = provider();
   try {
     const [rows] = await pool.query(
-      'SELECT role, content FROM chat_messages WHERE user_id = ? ORDER BY id DESC LIMIT ?',
-      [req.user.id, HISTORY_TURNS - 1]
+      'SELECT role, content FROM chat_messages WHERE user_id = ? ORDER BY chat_message_id DESC LIMIT ?',
+      [req.user.user_id, HISTORY_TURNS - 1]
     );
     const messages = rows.reverse().map((r) => ({ role: r.role, content: r.content }));
     messages.push({ role: 'user', content: message }); // saved only once the reply succeeds
     while (messages.length && messages[0].role !== 'user') messages.shift(); // must start with the customer
 
-    const [store, customer] = await Promise.all([storeContext(), customerContext(req.user.id)]);
+    const [store, customer] = await Promise.all([storeContext(), customerContext(req.user.user_id)]);
     const onText = (text) => send({ type: 'text', text });
 
     const result = which === 'gemini'
@@ -331,7 +331,7 @@ exports.send = async (req, res) => {
     }
     // Question and answer are stored together, so failed attempts leave no orphan questions
     await pool.query('INSERT INTO chat_messages (user_id, role, content) VALUES (?, ?, ?), (?, ?, ?)',
-      [req.user.id, 'user', message, req.user.id, 'assistant', reply]);
+      [req.user.user_id, 'user', message, req.user.user_id, 'assistant', reply]);
     send({ type: 'done', truncated: result.truncated });
     return res.end();
   } catch (err) {

@@ -66,8 +66,8 @@ export default function ShopSettings() {
       const shop = await dispatch(updateShopSettings(form)).unwrap();
       dispatch(setShop(shop)); // website header/footer pick it up right away
       notify.updated('Shop details updated successfully');
-    } catch (message) {
-      notify.error(message);
+    } catch (err) {
+      notify.error(err.message);
     }
   };
 

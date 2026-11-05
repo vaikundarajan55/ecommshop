@@ -17,7 +17,7 @@ export default function UserList() {
   const toggleStatus = async (row) => {
     const newStatus = row.status === 'active' ? 'blocked' : 'active';
     try {
-      await dispatch(updateUserStatus({ id: row.id, status: newStatus })).unwrap();
+      await dispatch(updateUserStatus({ id: row.user_id, status: newStatus })).unwrap();
       notify.updated(`User ${newStatus}`);
     } catch (message) {
       notify.error(message);
@@ -42,8 +42,9 @@ export default function UserList() {
       </form>
 
       <DataTable
+        rowKey="user_id"
         columns={[
-          { key: 'id', label: 'ID' },
+          { key: 'user_id', label: 'ID' },
           { key: 'name', label: 'Name' },
           { key: 'email', label: 'Email' },
           { key: 'role', label: 'Role' },

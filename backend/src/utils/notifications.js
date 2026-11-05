@@ -3,9 +3,9 @@
 const { pool } = require('../config/db');
 const { sendMail } = require('./mailer');
 const templates = require('./emailTemplates');
-const ShopModel = require('../models/shopModel');
-const PaymentMethodModel = require('../models/paymentMethodModel');
-const { OrderModel } = require('../models/orderModel');
+const ShopModel = require('../models/website/shopModel');
+const PaymentMethodModel = require('../models/website/paymentMethodModel');
+const { OrderModel } = require('../models/website/orderModel');
 
 const shopInfo = () => ShopModel.get().catch(() => null);
 

@@ -13,7 +13,7 @@ export const defaultPerView = (w) => (w >= 1024 ? 4 : w >= 640 ? 3 : 2);
  * - pauses on hover / focus / touch and while the tab is hidden; no autoplay with reduced motion
  * - arrows, dots and swipe
  *
- *   <Carousel items={list} getKey={(p) => p.id} label="Featured products" renderItem={(p, i) => <Card ... />} />
+ *   <Carousel items={list} getKey={(p) => p.product_id} label="Featured products" renderItem={(p, i) => <Card ... />} />
  */
 export default function Carousel({ items: source, renderItem, getKey, label, interval = 3000, perViewFor = defaultPerView, dotLabel = () => '' }) {
   const [perView, setPerView] = useState(() => perViewFor(window.innerWidth));

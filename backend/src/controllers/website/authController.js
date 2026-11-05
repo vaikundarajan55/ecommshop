@@ -1,16 +1,16 @@
-// src/controllers/authController.js
+// src/controllers/website/authController.js
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const UserModel = require('../models/userModel');
-const notifications = require('../utils/notifications');
-const captcha = require('../utils/captcha');
-const { clean, normalizePhone, isMobile, sendErrors, EMAIL_PATTERN, PERSON_PATTERN } = require('../utils/validate');
+const UserModel = require('../../models/website/userModel');
+const notifications = require('../../utils/notifications');
+const captcha = require('../../utils/captcha');
+const { clean, normalizePhone, isMobile, sendErrors, EMAIL_PATTERN, PERSON_PATTERN } = require('../../utils/validate');
 
 const MIN_PASSWORD = 6;
 
 const generateToken = (user) =>
-  jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, {
+  jwt.sign({ user_id: user.user_id, email: user.email, role: user.role }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN || '1d',
   });
 
@@ -104,7 +104,7 @@ exports.changePassword = async (req, res, next) => {
     if (!match) return res.status(400).json({ success: false, message: 'Old password is incorrect' });
 
     const hashed = await bcrypt.hash(newPassword, 10);
-    await UserModel.updatePassword(user.id, hashed);
+    await UserModel.updatePassword(user.user_id, hashed);
     res.json({ success: true, message: 'Password changed successfully' });
   } catch (err) {
     next(err);
@@ -124,7 +124,7 @@ exports.forgotPassword = async (req, res, next) => {
 
     const token = crypto.randomBytes(32).toString('hex');
     const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-    await UserModel.saveResetToken(user.id, token, expires);
+    await UserModel.saveResetToken(user.user_id, token, expires);
 
     const base = portal === 'admin'
       ? `${process.env.CLIENT_ADMIN_URL || 'http://localhost:5174'}/admin/reset-password`
@@ -151,8 +151,8 @@ exports.forgotChangePassword = async (req, res, next) => {
     if (!user) return res.status(400).json({ success: false, message: 'Invalid or expired reset token' });
 
     const hashed = await bcrypt.hash(newPassword, 10);
-    await UserModel.updatePassword(user.id, hashed);
-    await UserModel.saveResetToken(user.id, null, null);
+    await UserModel.updatePassword(user.user_id, hashed);
+    await UserModel.saveResetToken(user.user_id, null, null);
     res.json({ success: true, message: 'Password reset successfully' });
   } catch (err) {
     next(err);
@@ -161,7 +161,7 @@ exports.forgotChangePassword = async (req, res, next) => {
 
 exports.me = async (req, res, next) => {
   try {
-    const user = await UserModel.findById(req.user.id);
+    const user = await UserModel.findById(req.user.user_id);
     res.json({ success: true, data: user });
   } catch (err) {
     next(err);
@@ -175,11 +175,11 @@ exports.updateProfile = async (req, res, next) => {
     const errors = {};
     checkPerson(errors, { name, phone });
     if (Object.keys(errors).length) return sendErrors(res, errors);
-    if (await UserModel.findByPhone(phone, req.user.id)) {
+    if (await UserModel.findByPhone(phone, req.user.user_id)) {
       return sendErrors(res, { phone: 'This mobile number is already registered with another account.' }, 409);
     }
-    await UserModel.updateProfile(req.user.id, { name, phone });
-    const user = await UserModel.findById(req.user.id);
+    await UserModel.updateProfile(req.user.user_id, { name, phone });
+    const user = await UserModel.findById(req.user.user_id);
     res.json({ success: true, message: 'Profile updated', data: user });
   } catch (err) {
     next(err);

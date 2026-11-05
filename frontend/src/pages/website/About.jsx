@@ -5,6 +5,7 @@ import { Info, Truck, ShieldCheck, RotateCcw, Headphones, Sparkles, HeartHandsha
 import { fetchAbout } from '../../store/slices/website/cmsSlice';
 import { imageUrl } from '../../utils/imageUrl';
 import useSeo from '../../hooks/useSeo';
+import useLiveContent from '../../hooks/useLiveContent';
 import useReveal from '../../hooks/useReveal';
 import PageHero from '../../components/website/common/PageHero';
 
@@ -38,6 +39,7 @@ export default function About() {
   const about = loaded || (aboutFailed ? FALLBACK : null);
 
   useEffect(() => { dispatch(fetchAbout()); }, [dispatch]);
+  useLiveContent(['about'], () => dispatch(fetchAbout())); // Admin > About page saved
 
   const page = about || FALLBACK;
   useSeo({ title: 'About us', description: page.subtitle ? `${page.subtitle} ${page.content || ''}` : undefined, image: about?.image ? imageUrl(about.image) : undefined });

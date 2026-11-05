@@ -1,12 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import adminApi from '../../../services/adminApi';
-import { errorMessage } from '../../../utils/notify';
+import { errorMessage, formError } from '../../../utils/notify';
+import { clean } from '../../../utils/validators';
 
 // Admin > Testimonials (all of them, active or not)
 
 const toFormData = (t) => {
   const fd = new FormData();
-  ['name', 'designation', 'message', 'rating', 'sort_order', 'status'].forEach((k) => fd.append(k, t[k] ?? ''));
+  fd.append('name', clean(t.name));
+  fd.append('designation', clean(t.designation));
+  ['message', 'rating', 'sort_order', 'status'].forEach((k) => fd.append(k, t[k] ?? ''));
   if (t.image) fd.append('image', t.image);
   return fd;
 };
@@ -20,23 +23,24 @@ export const fetchAllTestimonials = createAsyncThunk('testimonials/fetchAll', as
   }
 });
 
+// Create / update reject with { message, errors }, same as Category
 export const createTestimonial = createAsyncThunk('testimonials/create', async (t, { dispatch, rejectWithValue }) => {
   try {
     const { data } = await adminApi.post('/cms/testimonials', toFormData(t));
     dispatch(fetchAllTestimonials());
     return data;
   } catch (err) {
-    return rejectWithValue(errorMessage(err));
+    return rejectWithValue(formError(err));
   }
 });
 
 export const updateTestimonial = createAsyncThunk('testimonials/update', async (t, { dispatch, rejectWithValue }) => {
   try {
-    const { data } = await adminApi.put(`/cms/testimonials/${t.id}`, toFormData(t));
+    const { data } = await adminApi.put(`/cms/testimonials/${t.testimonial_id}`, toFormData(t));
     dispatch(fetchAllTestimonials());
     return data;
   } catch (err) {
-    return rejectWithValue(errorMessage(err));
+    return rejectWithValue(formError(err));
   }
 });
 
@@ -65,14 +69,14 @@ const testimonialSlice = createSlice({
       .addCase(fetchAllTestimonials.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
       .addCase(deleteTestimonial.fulfilled, (state, action) => {
-        state.items = state.items.filter((t) => t.id !== action.payload);
+        state.items = state.items.filter((t) => t.testimonial_id !== action.payload);
       });
 
     [createTestimonial, updateTestimonial].forEach((thunk) => {
       builder
         .addCase(thunk.pending, (state) => { state.saving = true; state.error = null; })
         .addCase(thunk.fulfilled, (state) => { state.saving = false; })
-        .addCase(thunk.rejected, (state, action) => { state.saving = false; state.error = action.payload; });
+        .addCase(thunk.rejected, (state, action) => { state.saving = false; state.error = action.payload?.message; });
     });
   },
 });

@@ -45,7 +45,7 @@ export const createProduct = createAsyncThunk('products/create', async (product,
 
 export const updateProduct = createAsyncThunk('products/update', async (product, { dispatch, rejectWithValue }) => {
   try {
-    const { data } = await adminApi.put(`/products/${product.id}`, toFormData(product));
+    const { data } = await adminApi.put(`/products/${product.product_id}`, toFormData(product));
     dispatch(fetchProducts());
     return data;
   } catch (err) {
@@ -99,7 +99,7 @@ const productSlice = createSlice({
       .addCase(fetchProducts.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
       .addCase(deleteProduct.fulfilled, (state, action) => {
-        state.items = state.items.filter((p) => p.id !== action.payload);
+        state.items = state.items.filter((p) => p.product_id !== action.payload);
       });
 
     [createProduct, updateProduct].forEach((thunk) => {

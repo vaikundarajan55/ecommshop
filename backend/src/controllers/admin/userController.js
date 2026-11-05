@@ -1,5 +1,5 @@
-// src/controllers/userController.js (admin: manage website customers / staff)
-const UserModel = require('../models/userModel');
+// src/controllers/admin/userController.js (admin: manage website customers / staff)
+const UserModel = require('../../models/admin/userModel');
 
 exports.list = async (req, res, next) => {
   try {

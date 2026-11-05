@@ -175,6 +175,7 @@ export default function Visitors() {
             { key: 'created_at', label: 'Time', render: (r) => <span className="whitespace-nowrap text-gray-500">{when(r.created_at)}</span> },
           ]}
           rows={viewRows}
+          rowKey="site_visit_id"
           pageSize={15}
           emptyText={q ? 'No page views match your search' : 'No page views recorded yet'}
           renderActions={(row) => (
@@ -193,6 +194,7 @@ export default function Visitors() {
             { key: 'last_seen', label: 'Last seen', render: (r) => <span className="whitespace-nowrap text-gray-500">{when(r.last_seen)}</span> },
           ]}
           rows={ipRows}
+          rowKey="ip"
           pageSize={10}
           emptyText={q ? 'No visitors match your search' : 'No visitors recorded yet'}
           renderActions={(row) => (
@@ -221,7 +223,7 @@ export default function Visitors() {
                 </thead>
                 <tbody className="divide-y divide-sky-50">
                   {history.map((h, idx) => (
-                    <tr key={h.id} className="animate-rowIn transition-colors even:bg-sky-50/40 hover:bg-sky-50" style={{ animationDelay: `${Math.min(idx, 15) * 35}ms` }}>
+                    <tr key={h.site_visit_id} className="animate-rowIn transition-colors even:bg-sky-50/40 hover:bg-sky-50" style={{ animationDelay: `${Math.min(idx, 15) * 35}ms` }}>
                       <td className="whitespace-nowrap px-3 py-2 text-gray-500">{when(h.created_at)}</td>
                       <td className="px-3 py-2"><PageLink name={h.page_name} path={h.path} /></td>
                       <td className="px-3 py-2 text-gray-600">{h.user_name || <span className="text-gray-400">Guest</span>}</td>

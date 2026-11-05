@@ -4,7 +4,8 @@ import { ChevronLeft, ChevronRight, Inbox } from 'lucide-react';
 // Admin theme gradient (--cp-gradient in index.css), same as the sidebar
 const HEADER_BG = 'cp-gradient-bg animate-gradient motion-reduce:animate-none';
 
-export default function DataTable({ columns, rows, renderActions, pageSize = 8, emptyText = 'No records found' }) {
+// rowKey: the column holding each row's unique id (e.g. 'product_id') - used as the React key
+export default function DataTable({ columns, rows, rowKey = 'id', renderActions, pageSize = 8, emptyText = 'No records found' }) {
   const [page, setPage] = useState(1);
   // 1 = moved forward, -1 = moved back, 0 = first render / new data -> picks the row entrance animation
   const [dir, setDir] = useState(0);
@@ -67,7 +68,7 @@ export default function DataTable({ columns, rows, renderActions, pageSize = 8, 
             )}
             {pagedRows.map((row, idx) => (
               <tr
-                key={row.id ?? idx}
+                key={row[rowKey] ?? idx}
                 className={`${rowAnim} group transition-colors duration-200 odd:bg-white even:bg-sky-50/40 hover:bg-gradient-to-r hover:from-sky-50 hover:via-cyan-50/70 hover:to-transparent`}
                 style={{ animationDelay: `${idx * 45}ms` }}
               >
@@ -95,7 +96,7 @@ export default function DataTable({ columns, rows, renderActions, pageSize = 8, 
         {pagedRows.length === 0 && empty}
         {pagedRows.map((row, idx) => (
           <div
-            key={row.id ?? idx}
+            key={row[rowKey] ?? idx}
             className={`${rowAnim} space-y-1.5 border-l-4 border-transparent p-4 transition-all duration-200 hover:border-sky-500 hover:bg-gradient-to-r hover:from-sky-50 hover:to-transparent active:bg-sky-50/60`}
             style={{ animationDelay: `${idx * 50}ms` }}
           >

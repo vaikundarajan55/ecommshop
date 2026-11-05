@@ -51,8 +51,8 @@ export default function AboutPage() {
     try {
       await dispatch(updateAbout(form)).unwrap();
       notify.updated('About page updated successfully');
-    } catch (message) {
-      notify.error(message);
+    } catch (err) {
+      notify.error(err.message);
     }
   };
 

@@ -31,13 +31,13 @@ export default function ContactMessages() {
   const [filter, setFilter] = useState('');
   const [viewId, setViewId] = useState(null);
   const [viewOpen, setViewOpen] = useState(false);
-  const viewRow = all.find((m) => m.id === viewId); // read from the store so status changes show right away
+  const viewRow = all.find((m) => m.contact_message_id === viewId); // read from the store so status changes show right away
 
   useEffect(() => { dispatch(fetchContacts()); }, [dispatch]);
 
   const setStatus = async (row, status, silent = false) => {
     try {
-      await dispatch(updateContactStatus({ id: row.id, status })).unwrap();
+      await dispatch(updateContactStatus({ id: row.contact_message_id, status })).unwrap();
       if (!silent) notify.updated(`Marked as ${status}`);
     } catch (message) {
       notify.error(message);
@@ -46,7 +46,7 @@ export default function ContactMessages() {
 
   // Opening a new message marks it as read
   const openView = (row) => {
-    setViewId(row.id);
+    setViewId(row.contact_message_id);
     setViewOpen(true);
     if (row.status === 'new') setStatus(row, 'read', true);
   };
@@ -55,7 +55,7 @@ export default function ContactMessages() {
     const ok = await confirmDialog({
       title: 'Delete enquiry?',
       message: `The enquiry from "${row.name}" will be permanently deleted.`,
-      onConfirm: () => dispatch(deleteContact(row.id)).unwrap(),
+      onConfirm: () => dispatch(deleteContact(row.contact_message_id)).unwrap(),
     });
     if (!ok) return;
     notify.deleted('Enquiry deleted');
@@ -88,6 +88,7 @@ export default function ContactMessages() {
       </div>
 
       <DataTable
+        rowKey="contact_message_id"
         columns={[
           {
             key: 'name', label: 'From',

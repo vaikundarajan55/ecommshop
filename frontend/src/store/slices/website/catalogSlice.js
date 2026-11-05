@@ -4,6 +4,9 @@ import { errorMessage } from '../../../utils/notify';
 
 // Website catalogue: home page product rows, the product list, categories and product details.
 
+// Thunks called with { silent: true } (live updates, hooks/useLiveContent) refresh without showing the loader
+const loud = (action) => !action.meta.arg?.silent;
+
 const getProducts = async (params) => (await siteApi.get('/products', { params: { status: 'active', ...params } })).data.data;
 
 // Products marked "Featured" in admin; falls back to the latest ones until some are marked
@@ -69,22 +72,22 @@ const catalogSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchFeaturedProducts.pending, (state) => { state.featuredLoading = true; })
+      .addCase(fetchFeaturedProducts.pending, (state, action) => { if (loud(action)) state.featuredLoading = true; })
       .addCase(fetchFeaturedProducts.fulfilled, (state, action) => { state.featuredLoading = false; state.featured = action.payload; })
       .addCase(fetchFeaturedProducts.rejected, (state) => { state.featuredLoading = false; })
 
       .addCase(fetchCurrentProducts.fulfilled, (state, action) => { state.current = action.payload; })
       .addCase(fetchCurrentProducts.rejected, (state) => { state.current = []; }) // section is just hidden
 
-      .addCase(fetchProducts.pending, (state) => { state.productsLoading = true; })
+      .addCase(fetchProducts.pending, (state, action) => { if (loud(action)) state.productsLoading = true; })
       .addCase(fetchProducts.fulfilled, (state, action) => { state.productsLoading = false; state.products = action.payload; })
       .addCase(fetchProducts.rejected, (state) => { state.productsLoading = false; })
 
-      .addCase(fetchActiveCategories.pending, (state) => { state.categoriesLoading = true; })
+      .addCase(fetchActiveCategories.pending, (state, action) => { if (loud(action)) state.categoriesLoading = true; })
       .addCase(fetchActiveCategories.fulfilled, (state, action) => { state.categoriesLoading = false; state.categories = action.payload; })
       .addCase(fetchActiveCategories.rejected, (state) => { state.categoriesLoading = false; })
 
-      .addCase(fetchProductById.fulfilled, (state, action) => { state.details[action.payload.id] = action.payload; });
+      .addCase(fetchProductById.fulfilled, (state, action) => { state.details[action.payload.product_id] = action.payload; });
   },
 });
 

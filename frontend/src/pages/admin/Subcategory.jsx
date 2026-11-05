@@ -14,7 +14,7 @@ import StatusBadge from '../../components/admin/common/StatusBadge';
 import Thumb from '../../components/admin/common/Thumb';
 import { nameError, findDuplicate } from '../../utils/validators';
 
-const emptyForm = { id: null, category_id: '', name: '', status: 'active', image: null, existingImage: null };
+const emptyForm = { subcategory_id: null, category_id: '', name: '', status: 'active', image: null, existingImage: null };
 
 export default function Subcategory() {
   const dispatch = useDispatch();
@@ -34,7 +34,7 @@ export default function Subcategory() {
   const openCreate = () => { setForm(emptyForm); setErrors({}); setModalOpen(true); };
   const openEdit = (row) => {
     setForm({
-      id: row.id, category_id: row.category_id, name: row.name, status: row.status,
+      subcategory_id: row.subcategory_id, category_id: row.category_id, name: row.name, status: row.status,
       image: null, existingImage: row.image,
     });
     setErrors({});
@@ -44,7 +44,7 @@ export default function Subcategory() {
 
   // The same name may exist under another category, but not twice in the same one
   const duplicate = form.category_id
-    ? findDuplicate(rows, form.name, form.id, (r) => String(r.category_id) === String(form.category_id))
+    ? findDuplicate(rows, form.name, form.subcategory_id, 'subcategory_id', (r) => String(r.category_id) === String(form.category_id))
     : undefined;
   const nameProblem = errors.name || (duplicate ? `"${duplicate.name}" already exists under ${duplicate.category_name}` : '');
 
@@ -59,7 +59,7 @@ export default function Subcategory() {
       return notify.error(Object.values(found)[0]);
     }
     try {
-      if (form.id) {
+      if (form.subcategory_id) {
         await dispatch(updateSubcategory(form)).unwrap();
         notify.updated('Subcategory updated successfully');
       } else {
@@ -77,7 +77,7 @@ export default function Subcategory() {
     const ok = await confirmDialog({
       title: 'Delete subcategory?',
       message: `"${row.name}" will be permanently deleted. This cannot be undone.`,
-      onConfirm: () => dispatch(deleteSubcategory(row.id)).unwrap(),
+      onConfirm: () => dispatch(deleteSubcategory(row.subcategory_id)).unwrap(),
     });
     if (!ok) return;
     notify.deleted(`Subcategory "${row.name}" deleted successfully`);
@@ -93,8 +93,9 @@ export default function Subcategory() {
       </div>
 
       <DataTable
+        rowKey="subcategory_id"
         columns={[
-          { key: 'id', label: 'ID' },
+          { key: 'subcategory_id', label: 'ID' },
           { key: 'image', label: 'Image', render: (row) => <Thumb src={row.image} alt={row.name} /> },
           { key: 'category_name', label: 'Category' },
           { key: 'name', label: 'Name' },
@@ -110,7 +111,7 @@ export default function Subcategory() {
         )}
       />
 
-      <Modal open={modalOpen} title={form.id ? 'Edit Subcategory' : 'Add Subcategory'} onClose={() => setModalOpen(false)}>
+      <Modal open={modalOpen} title={form.subcategory_id ? 'Edit Subcategory' : 'Add Subcategory'} onClose={() => setModalOpen(false)}>
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-600">Category</label>
@@ -118,7 +119,7 @@ export default function Subcategory() {
               onChange={(e) => { setForm({ ...form, category_id: e.target.value }); setErrors({}); }}
               className={`w-full rounded-md border px-3 py-2 text-sm ${errors.category_id ? 'border-red-400' : 'border-gray-300'}`}>
               <option value="">Select category</option>
-              {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              {categories.map((c) => <option key={c.category_id} value={c.category_id}>{c.name}</option>)}
             </select>
             {errors.category_id && <p className="mt-1 animate-fadeIn text-xs text-red-600">{errors.category_id}</p>}
           </div>

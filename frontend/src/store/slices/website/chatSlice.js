@@ -55,7 +55,7 @@ export const clearChatHistory = createAsyncThunk('chat/clearHistory', async (_, 
 
 // Adds the user's bubble plus an empty assistant bubble that fills in as the reply streams
 export const sendChatMessage = createAsyncThunk('chat/send', async (message, { dispatch, getState }) => {
-  dispatch(chatSlice.actions.messageSent({ id: `u${Date.now()}`, content: message }));
+  dispatch(chatSlice.actions.messageSent({ chat_message_id: `u${Date.now()}`, content: message }));
   try {
     await streamReply(message, getState().auth.token, (chunk) => dispatch(chatSlice.actions.replyChunk(chunk)));
     dispatch(chatSlice.actions.replyDone());
@@ -65,7 +65,7 @@ export const sendChatMessage = createAsyncThunk('chat/send', async (message, { d
 });
 
 const patchPending = (state, fn) => {
-  const msg = state.messages?.find((m) => m.id === 'pending');
+  const msg = state.messages?.find((m) => m.chat_message_id === 'pending');
   if (msg) fn(msg);
 };
 
@@ -79,14 +79,14 @@ const chatSlice = createSlice({
     messageSent: (state, action) => {
       state.messages = [
         ...(state.messages || []),
-        { id: action.payload.id, role: 'user', content: action.payload.content },
-        { id: 'pending', role: 'assistant', content: '' },
+        { chat_message_id: action.payload.chat_message_id, role: 'user', content: action.payload.content },
+        { chat_message_id: 'pending', role: 'assistant', content: '' },
       ];
     },
     replyChunk: (state, action) => { patchPending(state, (m) => { m.content += action.payload; }); },
-    replyDone: (state) => { patchPending(state, (m) => { m.id = `a${Date.now()}`; }); },
+    replyDone: (state) => { patchPending(state, (m) => { m.chat_message_id = `a${Date.now()}`; }); },
     replyFailed: (state, action) => {
-      patchPending(state, (m) => { m.id = `e${Date.now()}`; m.content = action.payload; m.error = true; });
+      patchPending(state, (m) => { m.chat_message_id = `e${Date.now()}`; m.content = action.payload; m.error = true; });
     },
   },
   extraReducers: (builder) => {
