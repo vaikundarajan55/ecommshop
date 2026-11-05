@@ -4,18 +4,34 @@ const { pool } = require('../../config/db');
 // Home page section a product appears in (admin/productModel reuses this list)
 const HIGHLIGHTS = ['none', 'featured', 'current'];
 
+// The price a shopper actually pays (what product cards show): the discount price when set
+const SELLING_PRICE = 'COALESCE(NULLIF(p.discount_price, 0), p.price)';
+const SORTS = {
+  price_asc: `${SELLING_PRICE} ASC, p.product_id ASC`,
+  price_desc: `${SELLING_PRICE} DESC, p.product_id ASC`,
+  newest: 'p.product_id DESC',
+};
+// Only non-negative numbers count as a price bound; anything else is ignored
+const priceBound = (v) => {
+  if (v === undefined || v === null || v === '') return null;
+  const n = Number(v);
+  return Number.isFinite(n) && n >= 0 ? n : null;
+};
+
 const ProductModel = {
   HIGHLIGHTS,
 
-  // Filtered / paginated product listing (admin + website)
-  list: async ({ categoryId, subcategoryId, search, status, minPrice, maxPrice, highlight, page = 1, limit = 20 }) => {
+  // Filtered / paginated product listing (admin + website). Price filters use the selling price.
+  list: async ({ categoryId, subcategoryId, search, status, minPrice, maxPrice, highlight, sort, page = 1, limit = 20 }) => {
     const where = [];
     const params = [];
+    const min = priceBound(minPrice);
+    const max = priceBound(maxPrice);
     if (categoryId) { where.push('p.category_id = ?'); params.push(categoryId); }
     if (subcategoryId) { where.push('p.subcategory_id = ?'); params.push(subcategoryId); }
     if (status) { where.push('p.status = ?'); params.push(status); }
-    if (minPrice) { where.push('p.price >= ?'); params.push(minPrice); }
-    if (maxPrice) { where.push('p.price <= ?'); params.push(maxPrice); }
+    if (min !== null) { where.push(`${SELLING_PRICE} >= ?`); params.push(min); }
+    if (max !== null) { where.push(`${SELLING_PRICE} <= ?`); params.push(max); }
     if (HIGHLIGHTS.includes(highlight)) { where.push('p.highlight = ?'); params.push(highlight); }
     if (search) {
       where.push('(MATCH(p.name, p.description) AGAINST (? IN NATURAL LANGUAGE MODE) OR p.name LIKE ?)');
@@ -30,7 +46,7 @@ const ProductModel = {
        LEFT JOIN categories c ON c.category_id = p.category_id
        LEFT JOIN subcategories sc ON sc.subcategory_id = p.subcategory_id
        ${where.length ? `WHERE ${where.join(' AND ')}` : ''}
-       ORDER BY p.product_id ASC
+       ORDER BY ${SORTS[sort] || 'p.product_id ASC'}
        LIMIT ? OFFSET ?`,
       [...params, lim, offset]
     );

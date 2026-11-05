@@ -3,9 +3,9 @@ const ProductModel = require('../../models/website/productModel');
 
 exports.list = async (req, res, next) => {
   try {
-    const { categoryId, subcategoryId, search, status, minPrice, maxPrice, highlight, page, limit } = req.query;
+    const { categoryId, subcategoryId, search, status, minPrice, maxPrice, highlight, sort, page, limit } = req.query;
     const data = await ProductModel.list({
-      categoryId, subcategoryId, search, status, minPrice, maxPrice, highlight,
+      categoryId, subcategoryId, search, status, minPrice, maxPrice, highlight, sort,
       page: Number(page) || 1, limit: Number(limit) || 20,
     });
     res.json({ success: true, data });

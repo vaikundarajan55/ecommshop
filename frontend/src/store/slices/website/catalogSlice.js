@@ -28,10 +28,13 @@ export const fetchCurrentProducts = createAsyncThunk('catalog/fetchCurrent', asy
   }
 });
 
-// Product list page: { categoryId, search }
-export const fetchProducts = createAsyncThunk('catalog/fetchProducts', async ({ categoryId, search } = {}, { rejectWithValue }) => {
+// Product list page: { categoryId, search, minPrice, maxPrice, sort }
+export const fetchProducts = createAsyncThunk('catalog/fetchProducts', async ({ categoryId, search, minPrice, maxPrice, sort } = {}, { rejectWithValue }) => {
   try {
-    return await getProducts({ categoryId: categoryId || undefined, search: search || undefined, limit: 24 });
+    return await getProducts({
+      categoryId: categoryId || undefined, search: search || undefined,
+      minPrice: minPrice || undefined, maxPrice: maxPrice || undefined, sort: sort || undefined, limit: 24,
+    });
   } catch (err) {
     return rejectWithValue(errorMessage(err, 'Could not load products'));
   }

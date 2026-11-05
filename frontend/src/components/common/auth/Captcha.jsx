@@ -46,7 +46,7 @@ export default function Captcha({ value, onChange, onIdChange, error, version = 
         <input
           value={value} onChange={(e) => onChange(e.target.value)} required maxLength={5}
           autoComplete="off" autoCapitalize="off" spellCheck={false} placeholder="Type here" aria-label="Captcha characters"
-          className={`min-w-0 flex-1 rounded-lg border bg-white/90 px-3 text-sm font-semibold uppercase tracking-[0.3em] outline-none transition-all focus:border-brand-500 focus:ring-4 focus:ring-brand-500/20 ${error ? 'border-red-400' : 'border-gray-300'}`}
+          className={`min-w-0 flex-1 rounded-lg border bg-white/90 px-3 text-sm font-semibold tracking-[0.3em] outline-none transition-all focus:border-brand-500 focus:ring-4 focus:ring-brand-500/20 ${error ? 'border-red-400' : 'border-gray-300'}`}
         />
       </div>
       {error
